@@ -15,7 +15,7 @@
   --highlight-fg: #000;
 }
 
-/* Bloquer le défilement horizontal pour tout le document */
+/* Bloquer le défilement horizontal */
 html, body {
   width: 100%;
   height: 100%;
@@ -92,7 +92,7 @@ body {
   justify-content: center;
 }
 
-/* Section spécifiques */
+/* Hauteurs spécifiques */
 #hiroshima {
   height: 150vh;
 }
@@ -293,7 +293,7 @@ p {
   max-width: 60px;
 }
 
-/* Boutons toggle (légendes fixes) */
+/* Boutons toggle (légende fixe) */
 .toggle-btn {
   background: transparent;
   border: none;
@@ -427,5 +427,5 @@ p {
   }
 }
 
-/* --- PC (au-delà de 1024px) --- */
-/* Pas de changement majeur ici, puisque le style de base s'applique */
+/* --- PC (>=1024px) --- */
+/* Le style de base s'applique */
