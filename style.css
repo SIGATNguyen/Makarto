@@ -15,15 +15,15 @@
   --highlight-fg: #000;
 }
 
-/* Base et polices */
+/* Bloquer le défilement horizontal pour tout le document */
 html, body {
   width: 100%;
   height: 100%;
+  overflow-x: hidden;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
   background-color: var(--secondary-color);
   color: var(--text-color);
-  overflow: auto;
 }
 
 body {
@@ -72,6 +72,7 @@ body {
   height: 100%;
   z-index: 3;
   overflow-y: scroll;
+  overflow-x: hidden;
   background: transparent;
   -webkit-overflow-scrolling: touch;
 }
@@ -81,7 +82,7 @@ body {
   width: 100%;
 }
 
-/* Sections */
+/* Sections générales */
 .step {
   position: relative;
   width: 100%;
@@ -91,7 +92,7 @@ body {
   justify-content: center;
 }
 
-/* Sections spécifiques */
+/* Section spécifiques */
 #hiroshima {
   height: 150vh;
 }
@@ -334,12 +335,12 @@ p {
   margin-bottom: 10px;
 }
 
-/* ============================= */
-/* MEDIA QUERIES (Responsive)    */
-/* ============================= */
+/* ==================== */
+/* MEDIA QUERIES      */
+/* ==================== */
 
-/* Tablettes (max-width: 1024px) */
-@media (max-width: 1024px) {
+/* --- Tablette (entre 768px et 1024px) --- */
+@media (max-width: 1024px) and (min-width: 768px) {
   h1 { font-size: 3.5em; }
   h2 { font-size: 2em; }
   p { font-size: 1em; }
@@ -362,7 +363,7 @@ p {
   }
 }
 
-/* Smartphones (max-width: 768px) */
+/* --- Smartphone (max-width: 768px) --- */
 @media (max-width: 768px) {
   .final-article {
     flex-direction: column;
@@ -425,3 +426,6 @@ p {
     display: none;
   }
 }
+
+/* --- PC (au-delà de 1024px) --- */
+/* Pas de changement majeur ici, puisque le style de base s'applique */
