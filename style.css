@@ -1,0 +1,428 @@
+/* Réinitialisation */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Palette de couleurs et variables */
+:root {
+  --primary-color: #000;
+  --secondary-color: #fff;
+  --accent-color: #c0392b;
+  --text-color: #000;
+  --highlight-bg: #f4cccc;
+  --highlight-fg: #000;
+}
+
+/* Base et polices */
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  overflow: auto;
+}
+
+body {
+  cursor: none;
+}
+
+/* Curseur personnalisé (caché sur mobile) */
+.custom-cursor {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: #AF0D1D;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+}
+
+/* Barre de progression */
+#progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 5px;
+  background: #AF0D1D;
+  z-index: 100;
+}
+
+/* Carte en fond */
+#map {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Conteneur du scrollytelling */
+#scroll-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  overflow-y: scroll;
+  background: transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroller {
+  position: relative;
+  width: 100%;
+}
+
+/* Sections de base */
+.step {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Sections spécifiques avec hauteur ajustée */
+#hiroshima {
+  height: 150vh;
+}
+
+#nagasaki {
+  height: 180vh;
+}
+
+/* Section Intro */
+.intro-background {
+  background: url('https://static-images.lpnt.fr/cd-cw1618/images/2020/08/30/20671109lpw-20671118-article-hiroshima-bombe-nucleaire-japon-jpg_7311454_660x287.jpg') center/cover no-repeat;
+  width: 100%;
+  height: 120vh;
+  position: relative;
+}
+
+.intro-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: var(--primary-color);
+  padding: 0 20px;
+}
+
+.intro-overlay h1 {
+  font-family: 'Bebas Neue', Arial, Helvetica, sans-serif;
+  font-size: 5em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.intro-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 0.5em;
+  gap: 0.3em;
+  text-align: center;
+}
+
+.meta-date,
+.byline {
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: bold;
+  background: var(--highlight-bg);
+  color: var(--highlight-fg);
+  padding: 2px 5px;
+  border-radius: 2px;
+}
+
+/* Conteneurs de texte */
+.text-container {
+  background: #fff;
+  color: #000;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.text-container.right {
+  margin-left: auto;
+  margin-right: 40px;
+}
+
+.text-container.maplibre-decalage {
+  margin-top: 600px;
+}
+
+h1, h2 {
+  font-family: Arial, Helvetica, sans-serif;
+  margin-bottom: 15px;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+p {
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+.highlight {
+  background: var(--highlight-bg);
+  color: var(--highlight-fg);
+  font-weight: bold;
+  padding: 2px 5px;
+}
+
+/* Section Infographie */
+#infographie-hiroshima {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.infographie-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.infographie-text {
+  flex: 0 0 40%;
+  background: #fff;
+  padding: 20px;
+  color: #000;
+  margin-right: 20px;
+}
+
+.infographie-image {
+  flex: 0 0 60%;
+}
+
+.infographie-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+/* Section Conclusion */
+#conclusion {
+  background: #fff;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.final-article {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  max-width: 1000px;
+  width: 90%;
+  margin: auto;
+  padding: 20px;
+}
+
+.final-text {
+  flex: 1;
+  padding-right: 20px;
+}
+
+.final-text h2 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: var(--primary-color);
+}
+
+.final-text p {
+  font-size: 1.1em;
+}
+
+.final-image img {
+  width: 350px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+}
+
+/* Section Footer */
+#footer {
+  background: var(--highlight-bg);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 10px;
+}
+
+.footer-content {
+  text-align: center;
+  max-width: 800px;
+}
+
+.footer-content p {
+  font-size: 0.8em;
+  margin-bottom: 5px;
+}
+
+.footer-images img {
+  margin: 0 5px;
+  max-width: 60px;
+}
+
+/* Boutons toggle (légendes fixes) */
+.toggle-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  transition: opacity 0.3s;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 10px;
+}
+
+.toggle-btn.inactive {
+  opacity: 0.5;
+}
+
+.toggle-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.toggle-label {
+  margin-left: 5px;
+  font-size: 0.9em;
+  color: #000;
+}
+
+/* Légende fixe */
+#fixed-legend {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 101;
+}
+
+.fixed-legend-content {
+  background: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* ============================= */
+/* MEDIA QUERIES (Responsive)    */
+/* ============================= */
+
+/* Tablettes (max-width: 1024px) */
+@media (max-width: 1024px) {
+  h1 { font-size: 3.5em; }
+  h2 { font-size: 2em; }
+  p { font-size: 1em; }
+  
+  .text-container.right {
+    margin-right: 20px;
+  }
+  
+  .text-container.maplibre-decalage {
+    margin-top: 400px;
+  }
+  
+  #progress-bar {
+    height: 6px;
+  }
+  
+  #fixed-legend {
+    top: 15px;
+    left: 15px;
+  }
+}
+
+/* Smartphones (max-width: 768px) */
+@media (max-width: 768px) {
+  .final-article {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .text-container {
+    max-width: 90%;
+    padding: 15px;
+    margin: 20px auto;
+  }
+  
+  .step {
+    height: auto;
+    padding: 50px 0;
+  }
+  
+  .intro-background, .intro-overlay {
+    height: 100vh;
+  }
+  
+  .intro-overlay h1 {
+    font-size: 2.5em;
+  }
+  
+  .text-container.maplibre-decalage {
+    margin-top: 200px;
+  }
+  
+  #map {
+    z-index: 0;
+  }
+  
+  #scroll-container {
+    z-index: 2;
+  }
+  
+  #fixed-legend {
+    top: auto;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    text-align: center;
+  }
+  
+  .fixed-legend-content {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .toggle-btn {
+    margin: 5px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Masquer le curseur sur mobile */
+  .custom-cursor {
+    display: none;
+  }
+}
