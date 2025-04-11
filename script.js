@@ -1,9 +1,12 @@
+// Définition du zoom initial en fonction de la taille de l'écran
+var initialZoom = window.innerWidth < 768 ? 3 : 6;
+
 // Initialisation de MapLibre
 var map = new maplibregl.Map({
   container: 'map',
   style: 'https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json',
   center: [137, 20],
-  zoom: 6,
+  zoom: initialZoom,
   pitch: 0,
   bearing: 0
 });
@@ -124,6 +127,16 @@ map.on('load', () => {
   setupToggle('toggle-naga-sauve-fixed');
 });
 
+// Fonction pour obtenir le niveau de zoom adapté pour chaque section
+function getZoom(city) {
+  if (window.innerWidth < 768) {
+    // Sur mobile, on baisse le zoom pour une vision plus large
+    return city === 'hiroshima' ? 10 : (city === 'nagasaki' ? 10 : map.getZoom());
+  } else {
+    return city === 'hiroshima' ? 12.5 : (city === 'nagasaki' ? 12.3 : map.getZoom());
+  }
+}
+
 // Configuration de Scrollama pour la navigation (flyTo)
 var scroller = scrollama();
 
@@ -134,9 +147,9 @@ function handleStepEnter(response) {
   document.getElementById("legend-nagasaki").style.display = "none";
   
   if (id === "hiroshima") {
-    map.flyTo({ center: [132.49859, 34.38477], zoom: 12.5, duration: 5000 });
+    map.flyTo({ center: [132.49859, 34.38477], zoom: getZoom('hiroshima'), duration: 5000 });
   } else if (id === "nagasaki") {
-    map.flyTo({ center: [129.89961, 32.75209], zoom: 12.3, duration: 5000 });
+    map.flyTo({ center: [129.89961, 32.75209], zoom: getZoom('nagasaki'), duration: 5000 });
   }
 }
 
@@ -160,14 +173,12 @@ function checkLegends() {
   var hiroRect = document.getElementById("hiroshima").getBoundingClientRect();
   var nagaRect = document.getElementById("nagasaki").getBoundingClientRect();
 
-  // Légende Hiroshima
   if (introRect.bottom <= -offset && hiroRect.bottom > offset) {
     document.getElementById("legend-hiroshima").style.display = "block";
   } else {
     document.getElementById("legend-hiroshima").style.display = "none";
   }
 
-  // Légende Nagasaki
   if (hiroRect.bottom <= -offset && nagaRect.bottom > offset) {
     document.getElementById("legend-nagasaki").style.display = "block";
   } else {
