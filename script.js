@@ -1,4 +1,4 @@
-// Définition du zoom initial en fonction de la taille de l'écran
+// Choix du zoom initial en fonction de la taille de l'écran
 var initialZoom = window.innerWidth < 768 ? 3 : 6;
 
 // Initialisation de MapLibre
@@ -11,7 +11,13 @@ var map = new maplibregl.Map({
   bearing: 0
 });
 
-// Ajout des sources et calques pour Hiroshima et Nagasaki
+// Lors du redimensionnement (changement de taille ou orientation), forcer le rafraîchissement
+window.addEventListener("resize", () => {
+  map.resize();
+  scroller.resize();
+});
+
+// Ajout des sources et des calques pour Hiroshima et Nagasaki
 map.on('load', () => {
   // --- Hiroshima ---
   map.addSource('hiroshima_detruit', {
@@ -22,10 +28,7 @@ map.on('load', () => {
     id: 'hiroshima_detruit_layer',
     type: 'fill',
     source: 'hiroshima_detruit',
-    paint: {
-      'fill-color': '#E40428',
-      'fill-opacity': 0.8
-    }
+    paint: { 'fill-color': '#E40428', 'fill-opacity': 0.8 }
   });
 
   map.addSource('hiroshima_moinsdetruit', {
@@ -36,10 +39,7 @@ map.on('load', () => {
     id: 'hiroshima_moinsdetruit_layer',
     type: 'fill',
     source: 'hiroshima_moinsdetruit',
-    paint: {
-      'fill-color': '#EECF68',
-      'fill-opacity': 0.8
-    }
+    paint: { 'fill-color': '#EECF68', 'fill-opacity': 0.8 }
   });
   
   map.addSource('hiroshima_sauve', {
@@ -50,10 +50,7 @@ map.on('load', () => {
     id: 'hiroshima_sauve_layer',
     type: 'fill',
     source: 'hiroshima_sauve',
-    paint: {
-      'fill-color': '#000000',
-      'fill-opacity': 0.8
-    }
+    paint: { 'fill-color': '#000000', 'fill-opacity': 0.8 }
   });
 
   // --- Nagasaki ---
@@ -65,10 +62,7 @@ map.on('load', () => {
     id: 'nagasaki_detruit_layer',
     type: 'fill',
     source: 'nagasaki_detruit',
-    paint: {
-      'fill-color': '#E40428',
-      'fill-opacity': 0.8
-    }
+    paint: { 'fill-color': '#E40428', 'fill-opacity': 0.8 }
   });
   
   map.addSource('nagasaki_feu', {
@@ -79,10 +73,7 @@ map.on('load', () => {
     id: 'nagasaki_feu_layer',
     type: 'fill',
     source: 'nagasaki_feu',
-    paint: {
-      'fill-color': '#FF8C00',
-      'fill-opacity': 0.8
-    }
+    paint: { 'fill-color': '#FF8C00', 'fill-opacity': 0.8 }
   });
   
   map.addSource('nagasaki_sauve', {
@@ -93,13 +84,10 @@ map.on('load', () => {
     id: 'nagasaki_sauve_layer',
     type: 'fill',
     source: 'nagasaki_sauve',
-    paint: {
-      'fill-color': '#000000',
-      'fill-opacity': 0.8
-    }
+    paint: { 'fill-color': '#000000', 'fill-opacity': 0.8 }
   });
 
-  // Gestion des boutons toggle (légende fixe)
+  // Configuration des boutons toggle de la légende fixe
   function setupToggle(btnId) {
     var btn = document.getElementById(btnId);
     btn.addEventListener('click', function () {
@@ -117,43 +105,66 @@ map.on('load', () => {
       }
     });
   }
-  // Toggle légende Hiroshima
+  // Appliquer aux différents boutons
   setupToggle('toggle-destroyed-fixed');
   setupToggle('toggle-lessdestroyed-fixed');
   setupToggle('toggle-sauve-fixed');
-  // Toggle légende Nagasaki
   setupToggle('toggle-naga-detruit-fixed');
   setupToggle('toggle-naga-feu-fixed');
   setupToggle('toggle-naga-sauve-fixed');
 });
 
-// Fonction pour obtenir le niveau de zoom adapté pour chaque section
-function getZoom(city) {
+// Renvoie des paramètres de flyTo adaptés en fonction du support et de la section
+function getFlyToParams(city) {
+  // Sur téléphone (max-width <768px)
   if (window.innerWidth < 768) {
-    // Sur mobile, on baisse le zoom pour une vision plus large
-    return city === 'hiroshima' ? 10 : (city === 'nagasaki' ? 10 : map.getZoom());
-  } else {
-    return city === 'hiroshima' ? 12.5 : (city === 'nagasaki' ? 12.3 : map.getZoom());
+    if (city === 'hiroshima') {
+      return { center: [130, 35], zoom: 10, duration: 5000 };
+    } else if (city === 'nagasaki') {
+      return { center: [130, 33], zoom: 10, duration: 5000 };
+    }
   }
+  // Sur tablette (entre 768px et 1024px)
+  else if (window.innerWidth < 1024) {
+    if (city === 'hiroshima') {
+      return { center: [132, 34.5], zoom: 12, duration: 5000 };
+    } else if (city === 'nagasaki') {
+      return { center: [130, 32.5], zoom: 12, duration: 5000 };
+    }
+  }
+  // Sur PC (largueur >= 1024px)
+  else {
+    if (city === 'hiroshima') {
+      return { center: [132.49859, 34.38477], zoom: 12.5, duration: 5000 };
+    } else if (city === 'nagasaki') {
+      return { center: [129.89961, 32.75209], zoom: 12.3, duration: 5000 };
+    }
+  }
+  return { center: map.getCenter(), zoom: map.getZoom(), duration: 5000 };
 }
 
-// Configuration de Scrollama pour la navigation (flyTo)
+// Configuration de Scrollama pour la navigation par scrollytelling
 var scroller = scrollama();
 
 function handleStepEnter(response) {
-  var id = response.element.id;
-  // Masquer toutes les légendes
+  // Masquer les légendes par défaut
   document.getElementById("legend-hiroshima").style.display = "none";
   document.getElementById("legend-nagasaki").style.display = "none";
   
-  if (id === "hiroshima") {
-    map.flyTo({ center: [132.49859, 34.38477], zoom: getZoom('hiroshima'), duration: 5000 });
-  } else if (id === "nagasaki") {
-    map.flyTo({ center: [129.89961, 32.75209], zoom: getZoom('nagasaki'), duration: 5000 });
+  var params;
+  if (response.element.id === "hiroshima") {
+    params = getFlyToParams('hiroshima');
+  } else if (response.element.id === "nagasaki") {
+    params = getFlyToParams('nagasaki');
+  }
+  if (params) {
+    map.flyTo(params);
   }
 }
 
-function handleStepExit(response) {}
+function handleStepExit(response) {
+  // Optionnel : animations ou ajustements à la sortie d'une étape
+}
 
 scroller.setup({
   container: "#scroll-container",
@@ -166,30 +177,8 @@ scroller.setup({
 
 window.addEventListener("resize", scroller.resize);
 
-// Affichage des légendes en fonction du scroll
-function checkLegends() {
-  var offset = 50;
-  var introRect = document.getElementById("intro").getBoundingClientRect();
-  var hiroRect = document.getElementById("hiroshima").getBoundingClientRect();
-  var nagaRect = document.getElementById("nagasaki").getBoundingClientRect();
-
-  if (introRect.bottom <= -offset && hiroRect.bottom > offset) {
-    document.getElementById("legend-hiroshima").style.display = "block";
-  } else {
-    document.getElementById("legend-hiroshima").style.display = "none";
-  }
-
-  if (hiroRect.bottom <= -offset && nagaRect.bottom > offset) {
-    document.getElementById("legend-nagasaki").style.display = "block";
-  } else {
-    document.getElementById("legend-nagasaki").style.display = "none";
-  }
-}
-
+// Barre de progression et interactions diverses
 var scrollContainer = document.getElementById("scroll-container");
-scrollContainer.addEventListener("scroll", checkLegends);
-
-// Gestion de la barre de progression
 scrollContainer.addEventListener("scroll", function () {
   var scrolled = scrollContainer.scrollTop;
   var maxHeight = scrollContainer.scrollHeight - scrollContainer.clientHeight;
@@ -197,14 +186,14 @@ scrollContainer.addEventListener("scroll", function () {
   document.getElementById("progress-bar").style.width = progress + "%";
 });
 
-// Curseur personnalisé
+// Curseur personnalisé (les styles masquent ce dernier sur mobile)
 document.addEventListener("mousemove", function (e) {
   var cursor = document.querySelector(".custom-cursor");
   cursor.style.left = e.clientX + "px";
   cursor.style.top = e.clientY + "px";
 });
 
-// Gestion du scroll avec la roulette de la souris
+// Gestion du défilement avec la roulette de la souris
 scrollContainer.addEventListener("wheel", function (e) {
   e.preventDefault();
   scrollContainer.scrollTop += e.deltaY * 0.28;
