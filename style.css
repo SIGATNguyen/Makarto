@@ -1,4 +1,4 @@
-/* Réinitialisation */
+/* Réinitialisation de base */
 * {
   margin: 0;
   padding: 0;
@@ -30,7 +30,7 @@ body {
   cursor: none;
 }
 
-/* Curseur personnalisé (caché sur mobile) */
+/* Curseur personnalisé */
 .custom-cursor {
   position: fixed;
   width: 10px;
@@ -81,7 +81,7 @@ body {
   width: 100%;
 }
 
-/* Sections de base */
+/* Sections */
 .step {
   position: relative;
   width: 100%;
@@ -91,7 +91,7 @@ body {
   justify-content: center;
 }
 
-/* Sections spécifiques avec hauteur ajustée */
+/* Sections spécifiques */
 #hiroshima {
   height: 150vh;
 }
@@ -138,7 +138,6 @@ body {
   align-items: center;
   margin-top: 0.5em;
   gap: 0.3em;
-  text-align: center;
 }
 
 .meta-date,
