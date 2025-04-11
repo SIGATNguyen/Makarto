@@ -2,23 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- IMPORTANT : Assurer que le viewport s'ajuste pour PC, tablette et téléphone -->
+    <!-- Permet l'adaptation sur PC, tablette et téléphone -->
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>MEDIA?</title>
     <link rel="stylesheet" href="./style.css" />
-    <!-- Inclusion des polices et MapLibre -->
+    <!-- Inclusion des polices et de MapLibre -->
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
     <link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
   </head>
   <body>
-    <!-- Élément interactif (curseur personnalisé) -->
+    <!-- Curseur personnalisé -->
     <div class="custom-cursor"></div>
     <!-- Barre de progression -->
     <div id="progress-bar"></div>
-    <!-- Conteneur de la carte (fixe en fond) -->
+    <!-- Carte en fond -->
     <div id="map"></div>
     
-    <!-- Légende fixe pour naviguer rapidement -->
+    <!-- Légende fixe -->
     <div id="fixed-legend">
       <div id="legend-hiroshima" class="fixed-legend-content" style="display: none;">
         <button id="toggle-destroyed-fixed" class="toggle-btn active" data-layer="hiroshima_detruit_layer">
