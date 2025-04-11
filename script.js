@@ -1,7 +1,7 @@
 // Initialisation de MapLibre
 var map = new maplibregl.Map({
   container: 'map',
-  style: 'https://raw.githubusercontent.com/SIGATNguyen/Web_carto/refs/heads/main/Fond_de_carte/fcv1.json',
+  style: 'https://cdn.jsdelivr.net/gh/SIGATNguyen/Web_carto@main/Fond_de_carte/fcv1.json',
   center: [137, 20],
   zoom: 6,
   pitch: 0,
