@@ -1,4 +1,4 @@
-// Choix du zoom initial en fonction de la taille de l'écran
+// Choix du zoom initial en fonction de la taille d'écran
 var initialZoom = window.innerWidth < 768 ? 3 : 6;
 
 // Initialisation de MapLibre
@@ -11,13 +11,13 @@ var map = new maplibregl.Map({
   bearing: 0
 });
 
-// Lors du redimensionnement (changement de taille ou orientation), forcer le rafraîchissement
+// Lors du redimensionnement ou changement d'orientation, forcer le recalcul
 window.addEventListener("resize", () => {
   map.resize();
   scroller.resize();
 });
 
-// Ajout des sources et des calques pour Hiroshima et Nagasaki
+// Ajout des sources et couches pour Hiroshima et Nagasaki
 map.on('load', () => {
   // --- Hiroshima ---
   map.addSource('hiroshima_detruit', {
@@ -30,7 +30,7 @@ map.on('load', () => {
     source: 'hiroshima_detruit',
     paint: { 'fill-color': '#E40428', 'fill-opacity': 0.8 }
   });
-
+  
   map.addSource('hiroshima_moinsdetruit', {
     type: 'geojson',
     data: 'https://raw.githubusercontent.com/SIGATNguyen/Web_carto/refs/heads/main/Hiroshima/hiro_part_detruit_v2.geojson'
@@ -87,7 +87,7 @@ map.on('load', () => {
     paint: { 'fill-color': '#000000', 'fill-opacity': 0.8 }
   });
 
-  // Configuration des boutons toggle de la légende fixe
+  // Configuration des boutons toggle pour la légende fixe
   function setupToggle(btnId) {
     var btn = document.getElementById(btnId);
     btn.addEventListener('click', function () {
@@ -105,7 +105,6 @@ map.on('load', () => {
       }
     });
   }
-  // Appliquer aux différents boutons
   setupToggle('toggle-destroyed-fixed');
   setupToggle('toggle-lessdestroyed-fixed');
   setupToggle('toggle-sauve-fixed');
@@ -114,40 +113,39 @@ map.on('load', () => {
   setupToggle('toggle-naga-sauve-fixed');
 });
 
-// Renvoie des paramètres de flyTo adaptés en fonction du support et de la section
+// Fonction getFlyToParams qui ajuste les paramètres selon l'appareil et l'aspect ratio
 function getFlyToParams(city) {
-  // Sur téléphone (max-width <768px)
+  const aspect = window.innerWidth / window.innerHeight;
   if (window.innerWidth < 768) {
+    // Téléphone
     if (city === 'hiroshima') {
-      return { center: [130, 35], zoom: 10, duration: 5000 };
+      return { center: [130 - (1 - aspect) * 0.5, 35], zoom: 10, duration: 3000 };
     } else if (city === 'nagasaki') {
-      return { center: [130, 33], zoom: 10, duration: 5000 };
+      return { center: [130 - (1 - aspect) * 0.5, 33], zoom: 10, duration: 3000 };
     }
-  }
-  // Sur tablette (entre 768px et 1024px)
-  else if (window.innerWidth < 1024) {
+  } else if (window.innerWidth < 1024) {
+    // Tablette
     if (city === 'hiroshima') {
-      return { center: [132, 34.5], zoom: 12, duration: 5000 };
+      return { center: [132 - (1 - aspect) * 0.3, 34.5], zoom: 12, duration: 4000 };
     } else if (city === 'nagasaki') {
-      return { center: [130, 32.5], zoom: 12, duration: 5000 };
+      return { center: [130 - (1 - aspect) * 0.3, 32.5], zoom: 12, duration: 4000 };
     }
-  }
-  // Sur PC (largueur >= 1024px)
-  else {
+  } else {
+    // PC
     if (city === 'hiroshima') {
       return { center: [132.49859, 34.38477], zoom: 12.5, duration: 5000 };
     } else if (city === 'nagasaki') {
       return { center: [129.89961, 32.75209], zoom: 12.3, duration: 5000 };
     }
   }
-  return { center: map.getCenter(), zoom: map.getZoom(), duration: 5000 };
+  return { center: map.getCenter(), zoom: map.getZoom(), duration: 4000 };
 }
 
-// Configuration de Scrollama pour la navigation par scrollytelling
+// Mise en place de Scrollama pour le scrollytelling
 var scroller = scrollama();
 
 function handleStepEnter(response) {
-  // Masquer les légendes par défaut
+  // Masquer toutes les légendes au démarrage
   document.getElementById("legend-hiroshima").style.display = "none";
   document.getElementById("legend-nagasaki").style.display = "none";
   
@@ -166,35 +164,6 @@ function handleStepExit(response) {
   // Optionnel : animations ou ajustements à la sortie d'une étape
 }
 
-scroller.setup({
-  container: "#scroll-container",
-  step: ".step",
-  offset: 0.5,
-  debug: false
-})
-  .onStepEnter(handleStepEnter)
-  .onStepExit(handleStepExit);
-
-window.addEventListener("resize", scroller.resize);
-
-// Barre de progression et interactions diverses
-var scrollContainer = document.getElementById("scroll-container");
-scrollContainer.addEventListener("scroll", function () {
-  var scrolled = scrollContainer.scrollTop;
-  var maxHeight = scrollContainer.scrollHeight - scrollContainer.clientHeight;
-  var progress = (scrolled / maxHeight) * 100;
-  document.getElementById("progress-bar").style.width = progress + "%";
-});
-
-// Curseur personnalisé (les styles masquent ce dernier sur mobile)
-document.addEventListener("mousemove", function (e) {
-  var cursor = document.querySelector(".custom-cursor");
-  cursor.style.left = e.clientX + "px";
-  cursor.style.top = e.clientY + "px";
-});
-
-// Gestion du défilement avec la roulette de la souris
-scrollContainer.addEventListener("wheel", function (e) {
-  e.preventDefault();
-  scrollContainer.scrollTop += e.deltaY * 0.28;
-}, { passive: false });
+// Throttle de la fonction de scroll (exemple : toutes les 50ms)
+function throttle(func, limit) {
+  let lastFunc;
