@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>MEDIA?</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>La Guerre du Pacifique (1941-1945) - Un récit journalistique</title>
+    <!-- Feuille de style MapLibre -->
+    <link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
+    <!-- Police Bebas Neue pour le titre -->
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
+    <!-- Inclusion du CSS -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Éléments fixes -->
+    <div class="custom-cursor"></div>
+    <div id="progress-bar"></div>
+    <div id="map"></div>
+    
+    <!-- Légende fixe -->
+    <div id="fixed-legend">
+      <div id="legend-hiroshima" class="fixed-legend-content" style="display: none;">
+        <button id="toggle-destroyed-fixed" class="toggle-btn active" data-layer="hiroshima_detruit_layer">
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="#E40428"/>
+          </svg>
+          <span class="toggle-label">Hiroshima détruit</span>
+        </button>
+        <button id="toggle-lessdestroyed-fixed" class="toggle-btn active" data-layer="hiroshima_moinsdetruit_layer">
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="#EECF68"/>
+          </svg>
+          <span class="toggle-label">Hiroshima moins détruit</span>
+        </button>
+        <button id="toggle-sauve-fixed" class="toggle-btn active" data-layer="hiroshima_sauve_layer">
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="#000000"/>
+          </svg>
+          <span class="toggle-label">Hiroshima sauvé</span>
+        </button>
+      </div>
+      <div id="legend-nagasaki" class="fixed-legend-content" style="display: none;">
+        <button id="toggle-naga-detruit-fixed" class="toggle-btn active" data-layer="nagasaki_detruit_layer">
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="#E40428"/>
+          </svg>
+          <span class="toggle-label">Nagasaki détruit</span>
+        </button>
+        <button id="toggle-naga-feu-fixed" class="toggle-btn active" data-layer="nagasaki_feu_layer">
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="#FF8C00"/>
+          </svg>
+          <span class="toggle-label">Nagasaki en feu</span>
+        </button>
+        <button id="toggle-naga-sauve-fixed" class="toggle-btn active" data-layer="nagasaki_sauve_layer">
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" fill="#000000"/>
+          </svg>
+          <span class="toggle-label">Nagasaki sauvé</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Contenu principal du scrollytelling -->
+    <main id="scroll-container">
+      <div class="scroller">
+        <!-- Section Intro -->
+        <section class="step" id="intro">
+          <div class="intro-background">
+            <div class="intro-overlay">
+              <h1>Il y a 80 ans<br />le Japon frappé par<br />le feu atomique</h1>
+              <div class="intro-meta">
+                <small class="meta-date highlight">PUBLIÉ LE 23 FÉVRIER 2025</small>
+                <small class="byline highlight">Par M2_SIGAT_OFCARTO</small>
+              </div>
+            </div>
+          </div>
+        </section>
+    
+        <!-- Section Hiroshima -->
+        <section class="step" id="hiroshima">
+          <article class="text-container right maplibre-decalage">
+            <h2>6 août 1945 - Hiroshima</h2>
+            <p>
+              Dès l'aube, Hiroshima fut frappée par une bombe atomique, marquant à jamais l’histoire.
+              La carte met en lumière cette tragédie de la façon suivante :
+            </p>
+            <p>
+              Les zones affichées en 
+              <span style="background-color: #E40428; color: #fff; padding: 2px 5px; border-radius: 2px;">rouge</span> 
+              représentent les quartiers complètement détruits par l'explosion. 
+              Les secteurs en 
+              <span style="background-color: #EECF68; color: #000; padding: 2px 5px; border-radius: 2px;">jaune</span> 
+              correspondent aux zones partiellement endommagées, témoignant de l'ampleur de la déflagration. 
+              Enfin, les parties en 
+              <span style="background-color: #000; color: #fff; padding: 2px 5px; border-radius: 2px;">noir</span> 
+              indiquent les quartiers qui ont été épargnés.
+            </p>
+          </article>
+        </section>
+    
+        <!-- Section Nagasaki -->
+        <section class="step" id="nagasaki">
+          <article class="text-container right">
+            <h2>9 août 1945 - Nagasaki</h2>
+            <p>
+              Lorsque la seconde bombe atomique explosa, Nagasaki fut en grande partie anéantie. Sur la carte, on distingue :
+              les zones en 
+              <span style="background-color: #E40428; color: #fff; padding: 2px 5px; border-radius: 2px;">rouge</span> 
+              indiquant les zones totalement détruites, 
+              celles en 
+              <span style="background-color: #FF8C00; color: #fff; padding: 2px 5px; border-radius: 2px;">orange</span>
+              marquant les secteurs ravagés par les incendies subséquents, et
+              enfin, les parties en 
+              <span style="background-color: #000; color: #fff; padding: 2px 5px; border-radius: 2px;">noir</span> 
+              représentant les zones relativement épargnées.
+            </p>
+            <p>
+              Cette représentation visuelle permet de mieux appréhender la violence de l'explosion et les conséquences sur l'urbanisme de la ville.
+            </p>
+          </article>
+        </section>
+    
+        <!-- Section Infographie -->
+        <section class="step" id="infographie-hiroshima">
+          <div class="infographie-container">
+            <article class="infographie-text">
+              <h2>Infographie : La bombe d'Hiroshima</h2>
+              <p>
+                Découvrez ici les principaux chiffres et l’impact de la bombe larguée sur Hiroshima, illustrés de manière visuelle et synthétique.
+              </p>
+              <p>
+                De la puissance de l’explosion aux conséquences démographiques, cette infographie met en lumière l’ampleur des dégâts et l’héritage de cet événement.
+              </p>
+            </article>
+            <figure class="infographie-image">
+              <img src="https://raw.githubusercontent.com/SIGATNguyen/DATA/main/ChatGPT%20Image%206%20avr.%202025%2C%2005_24_46.png" alt="Infographie sur la bombe d'Hiroshima" />
+            </figure>
+          </div>
+        </section>
+    
+        <!-- Section Conclusion -->
+        <section class="step" id="conclusion">
+          <article class="final-article">
+            <div class="final-text">
+              <h2>Conclusion</h2>
+              <p>
+                Cet article présente un regard approfondi sur l'évolution du conflit et ses répercussions durables. En retraçant les étapes majeures de la Guerre du Pacifique, nous comprenons mieux les enjeux stratégiques et humains de ce chapitre.
+              </p>
+            </div>
+            <figure class="final-image">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/3/3d/Fat_Man_Assembled_Tinian_1945.jpg" alt="Fat Man Assembled Tinian 1945" />
+            </figure>
+          </article>
+        </section>
+    
+        <!-- Section Footer -->
+        <section id="footer">
+          <article class="footer-content">
+            <p>Sources &amp; Copyright</p>
+            <p>© 2025 MASTER SIGAT Université Rennes2. Ouest-France.</p>
+            <div class="footer-images">
+              <img src="https://media.ouest-france.fr/v1/documents/d5a06162881f47abde8ca2f7b57b769e-of.svg" alt="Logo Partenaire 1" />
+              <img src="https://media.ouest-france.fr/v1/documents/d5a06162881f47abde8ca2f7b57b769e-of.svg" alt="Logo Partenaire 2" />
+            </div>
+          </article>
+        </section>
+      </div>
+    </main>
+    
+    <!-- Inclusion des scripts JavaScript -->
+    <script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/scrollama"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>
