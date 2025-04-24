@@ -1,191 +1,499 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>MEDIA?</title>
-  <link rel="stylesheet" href="./style.css">
-
+  <title>La Guerre du Pacifique (1941-1945) - Un récit journalistique</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Le Japon frappé par le feu atomique - 80 ans après Hiroshima et Nagasaki, un regard cartographique sur cette page sombre de l'histoire." />
+  <!-- MapLibre CSS - chargement optimisé -->
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" />
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="./style.css" />
+  <!-- Préchargement des ressources critiques -->
+  <link rel="preload" href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js" as="script">
+  <link rel="preload" href="https://unpkg.com/scrollama" as="script">
 </head>
 <body>
-<!-- partial:index.partial.html -->
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>La Guerre du Pacifique (1941-1945) - Un récit journalistique</title>
-    <!-- Feuille de style MapLibre -->
-    <link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
-    <!-- Police Bebas Neue pour le titre -->
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet" />
-    <!-- Inclusion du CSS -->
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <!-- Éléments fixes -->
-    <div class="custom-cursor"></div>
+  <!-- Indicateur de chargement -->
+  <div id="loading-indicator">
+    <div class="loading-circle"></div>
+    <p>Chargement de la carte...</p>
+  </div>
+  
+  <!-- Barre de progression globale avec indicateur -->
+  <div id="progress-container">
     <div id="progress-bar"></div>
+    <div id="progress-indicator"></div>
+  </div>
+  
+  <!-- Carte en fond avec effet de profondeur -->
+  <div id="map-container">
     <div id="map"></div>
-    
-    <!-- Légende fixe -->
-    <div id="fixed-legend">
-      <div id="legend-hiroshima" class="fixed-legend-content" style="display: none;">
-        <button id="toggle-destroyed-fixed" class="toggle-btn active" data-layer="hiroshima_detruit_layer">
-          <svg width="24" height="24" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="#E40428"/>
-          </svg>
-          <span class="toggle-label">Hiroshima détruit</span>
-        </button>
-        <button id="toggle-lessdestroyed-fixed" class="toggle-btn active" data-layer="hiroshima_moinsdetruit_layer">
-          <svg width="24" height="24" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="#EECF68"/>
-          </svg>
-          <span class="toggle-label">Hiroshima moins détruit</span>
-        </button>
-        <button id="toggle-sauve-fixed" class="toggle-btn active" data-layer="hiroshima_sauve_layer">
-          <svg width="24" height="24" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="#000000"/>
-          </svg>
-          <span class="toggle-label">Hiroshima sauvé</span>
-        </button>
-      </div>
-      <div id="legend-nagasaki" class="fixed-legend-content" style="display: none;">
-        <button id="toggle-naga-detruit-fixed" class="toggle-btn active" data-layer="nagasaki_detruit_layer">
-          <svg width="24" height="24" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="#E40428"/>
-          </svg>
-          <span class="toggle-label">Nagasaki détruit</span>
-        </button>
-        <button id="toggle-naga-feu-fixed" class="toggle-btn active" data-layer="nagasaki_feu_layer">
-          <svg width="24" height="24" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="#FF8C00"/>
-          </svg>
-          <span class="toggle-label">Nagasaki en feu</span>
-        </button>
-        <button id="toggle-naga-sauve-fixed" class="toggle-btn active" data-layer="nagasaki_sauve_layer">
-          <svg width="24" height="24" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="#000000"/>
-          </svg>
-          <span class="toggle-label">Nagasaki sauvé</span>
-        </button>
-      </div>
+    <div class="map-vignette"></div>
+  </div>
+  
+  <!-- Légendes dynamiques avec animations -->
+  <div id="fixed-legend">
+    <div id="legend-hiroshima" class="fixed-legend-content" style="display: none;">
+      <h3 class="legend-title">Impacts à Hiroshima</h3>
+      <button id="toggle-destroyed-fixed" class="toggle-btn active" data-layer="hiroshima_detruit_layer">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#B22222"/></svg>
+        <span class="toggle-label">Destruction totale</span>
+      </button>
+      <button id="toggle-lessdestroyed-fixed" class="toggle-btn active" data-layer="hiroshima_moinsdetruit_layer">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFA500"/></svg>
+        <span class="toggle-label">Destruction partielle</span>
+      </button>
+      <button id="toggle-sauve-fixed" class="toggle-btn active" data-layer="hiroshima_sauve_layer">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#2E8B57"/></svg>
+        <span class="toggle-label">Zones épargnées</span>
+      </button>
     </div>
-    
-    <!-- Contenu principal du scrollytelling -->
-    <main id="scroll-container">
-      <div class="scroller">
-        <!-- Section Intro -->
-        <section class="step" id="intro">
-          <div class="intro-background">
-            <div class="intro-overlay">
-              <h1>Il y a 80 ans<br />le Japon frappé par<br />le feu atomique</h1>
+    <div id="legend-nagasaki" class="fixed-legend-content" style="display: none;">
+      <h3 class="legend-title">Impacts à Nagasaki</h3>
+      <button id="toggle-naga-detruit-fixed" class="toggle-btn active" data-layer="nagasaki_detruit_layer">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#B22222"/></svg>
+        <span class="toggle-label">Destruction totale</span>
+      </button>
+      <button id="toggle-naga-feu-fixed" class="toggle-btn active" data-layer="nagasaki_feu_layer">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#FFA500"/></svg>
+        <span class="toggle-label">Zones incendiées</span>
+      </button>
+      <button id="toggle-naga-sauve-fixed" class="toggle-btn active" data-layer="nagasaki_sauve_layer">
+        <svg width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#2E8B57"/></svg>
+        <span class="toggle-label">Zones épargnées</span>
+      </button>
+    </div>
+  </div>
+  
+  <!-- Contenu du scrollytelling avec sections améliorées -->
+  <main id="scroll-container">
+    <div class="scroller">
+      <!-- Section Intro - fond uni au lieu d'image -->
+      <section class="step" id="intro">
+        <div class="intro-background">
+          <div class="intro-overlay">
+            <div class="intro-content">
+              <div class="intro-badge pulse-effect">80 ANS</div>
+              <h1 class="intro-title">
+                <span class="intro-line">LE JAPON</span>
+                <span class="intro-line-highlight">FRAPPÉ PAR</span>
+                <span class="intro-line">LE FEU ATOMIQUE</span>
+              </h1>
+              <div class="intro-separator"></div>
               <div class="intro-meta">
-                <small class="meta-date highlight">PUBLIÉ LE 23 FÉVRIER 2025</small>
-                <small class="byline highlight">Par M2_SIGAT_OFCARTO</small>
+                <div class="meta-info">
+                  <small class="meta-date">PUBLIÉ LE 23 FÉVRIER 2025</small>
+                  <small class="byline">Par Bureau d'Études Historiques</small>
+                </div>
+                <div class="scroll-indicator">
+                  <span>Défiler pour découvrir</span>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 4V20M12 20L6 14M12 20L18 14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
-        </section>
-    
-        <!-- Section Hiroshima -->
-        <section class="step" id="hiroshima">
-          <article class="text-container right maplibre-decalage">
-            <h2>6 août 1945 - Hiroshima</h2>
-            <p>
-              Dès l'aube, Hiroshima fut frappée par une bombe atomique, marquant à jamais l’histoire.
-              La carte met en lumière cette tragédie de la façon suivante :
-            </p>
-            <p>
-              Les zones affichées en 
-              <span style="background-color: #E40428; color: #fff; padding: 2px 5px; border-radius: 2px;">rouge</span> 
-              représentent les quartiers complètement détruits par l'explosion. 
-              Les secteurs en 
-              <span style="background-color: #EECF68; color: #000; padding: 2px 5px; border-radius: 2px;">jaune</span> 
-              correspondent aux zones partiellement endommagées, témoignant de l'ampleur de la déflagration. 
-              Enfin, les parties en 
-              <span style="background-color: #000; color: #fff; padding: 2px 5px; border-radius: 2px;">noir</span> 
-              indiquent les quartiers qui ont été épargnés.
-            </p>
-          </article>
-        </section>
-    
-        <!-- Section Nagasaki -->
-        <section class="step" id="nagasaki">
-          <article class="text-container right">
-            <h2>9 août 1945 - Nagasaki</h2>
-            <p>
-              Lorsque la seconde bombe atomique explosa, Nagasaki fut en grande partie anéantie. Sur la carte, on distingue :
-              les zones en 
-              <span style="background-color: #E40428; color: #fff; padding: 2px 5px; border-radius: 2px;">rouge</span> 
-              indiquant les zones totalement détruites, 
-              celles en 
-              <span style="background-color: #FF8C00; color: #fff; padding: 2px 5px; border-radius: 2px;">orange</span>
-              marquant les secteurs ravagés par les incendies subséquents, et
-              enfin, les parties en 
-              <span style="background-color: #000; color: #fff; padding: 2px 5px; border-radius: 2px;">noir</span> 
-              représentant les zones relativement épargnées.
-            </p>
-            <p>
-              Cette représentation visuelle permet de mieux appréhender la violence de l'explosion et les conséquences sur l'urbanisme de la ville.
-            </p>
-          </article>
-        </section>
-    
-        <!-- Section Infographie -->
-        <section class="step" id="infographie-hiroshima">
-          <div class="infographie-container">
-            <article class="infographie-text">
-              <h2>Infographie : La bombe d'Hiroshima</h2>
-              <p>
-                Découvrez ici les principaux chiffres et l’impact de la bombe larguée sur Hiroshima, illustrés de manière visuelle et synthétique.
-              </p>
-              <p>
-                De la puissance de l’explosion aux conséquences démographiques, cette infographie met en lumière l’ampleur des dégâts et l’héritage de cet événement.
-              </p>
-            </article>
-            <figure class="infographie-image">
-              <img src="https://raw.githubusercontent.com/SIGATNguyen/DATA/main/ChatGPT%20Image%206%20avr.%202025%2C%2005_24_46.png" alt="Infographie sur la bombe d'Hiroshima" />
-            </figure>
+        </div>
+      </section>
+      
+      <!-- Section Timeline MODIFIÉE - Nouvelle version avec chronologie enrichie -->
+      <section class="step" id="timeline">
+        <h2 class="timeline-header">De Pearl Harbor à Hiroshima et Nagasaki</h2>
+        <p class="timeline-subtitle">Chronologie des événements majeurs qui ont façonné le conflit du Pacifique</p>
+        
+        <!-- Timeline Container -->
+        <div class="timeline">
+          <!-- Événement 1 -->
+          <div class="timeline-item left">
+            <div class="timeline-content">
+              <span class="timeline-date">7 décembre 1941</span>
+              <h3 class="timeline-title">Attaque de Pearl Harbor</h3>
+              <p>Sans déclaration préalable, l'aviation japonaise bombarde la base navale américaine de Pearl Harbor (Hawaï), précipitant l'entrée en guerre des États-Unis dans le conflit mondial.</p>
+            </div>
           </div>
-        </section>
-    
-        <!-- Section Conclusion -->
-        <section class="step" id="conclusion">
-          <article class="final-article">
-            <div class="final-text">
-              <h2>Conclusion</h2>
+
+          <!-- Événement 2 -->
+          <div class="timeline-item right">
+            <div class="timeline-content">
+              <span class="timeline-date">4-7 juin 1942</span>
+              <h3 class="timeline-title">Bataille de Midway</h3>
+              <p>Victoire décisive des forces américaines contre la flotte japonaise près de l'atoll de Midway, marquant un tournant stratégique dans la guerre du Pacifique.</p>
+            </div>
+          </div>
+
+          <!-- Événement 3 -->
+          <div class="timeline-item left">
+            <div class="timeline-content">
+              <span class="timeline-date">Février 1945</span>
+              <h3 class="timeline-title">Iwo Jima</h3>
+              <p>Bataille sanglante où les Marines américains s'emparent de cette île stratégique, nécessaire aux B-29 en difficulté pour se poser sur le chemin du retour après avoir bombardé le Japon.</p>
+            </div>
+          </div>
+
+          <!-- Événement 4 -->
+          <div class="timeline-item right">
+            <div class="timeline-content">
+              <span class="timeline-date">1er avril - 22 juin 1945</span>
+              <h3 class="timeline-title">Bataille d'Okinawa</h3>
+              <p>L'une des batailles les plus meurtrières du Pacifique, avec plus de 200 000 morts. Cette bataille montre aux Américains le coût humain qu'impliquerait une invasion terrestre du Japon.</p>
+            </div>
+          </div>
+          
+          <!-- Événement 5 -->
+          <div class="timeline-item left">
+            <div class="timeline-content">
+              <span class="timeline-date">16 juillet 1945</span>
+              <h3 class="timeline-title">Test Trinity</h3>
+              <p>Premier essai réussi d'une bombe atomique dans le désert du Nouveau-Mexique, confirmant la viabilité de l'arme qui sera utilisée contre le Japon.</p>
+            </div>
+          </div>
+
+          <!-- Événement 6 -->
+          <div class="timeline-item right">
+            <div class="timeline-content">
+              <span class="timeline-date">26 juillet 1945</span>
+              <h3 class="timeline-title">Déclaration de Potsdam</h3>
+              <p>Les Alliés exigent la reddition sans condition du Japon, qui refuse ces termes. Ce refus sera l'un des arguments avancés pour justifier l'utilisation de l'arme atomique.</p>
+            </div>
+          </div>
+
+          <!-- Heure H - Élément final de la frise -->
+          <div class="timeline-item center heure-h">
+            <div class="timeline-content">
+              <div class="timeline-clock">
+                <div class="clock-face">
+                  <div class="clock-hand"></div>
+                  <div class="clock-center"></div>
+                </div>
+              </div>
+              <span class="timeline-date">6 et 9 août 1945</span>
+              <h3 class="timeline-title">Hiroshima et Nagasaki</h3>
+              <p>Les bombes atomiques "Little Boy" et "Fat Man" sont larguées sur Hiroshima et Nagasaki, causant des destructions sans précédent et précipitant la capitulation du Japon le 15 août 1945.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Section Lorem Ipsum après la frise -->
+      <section class="step" id="lorem-section">
+        <article class="article-container">
+          <div class="content-wrapper">
+            <div class="section-badge">Contexte</div>
+            <h2 class="article-title">Le conflit dans le Pacifique et les préparatifs de la fin de la guerre</h2>
+            
+            <div class="article-content">
+              <p class="lead-paragraph">
+                Le conflit dans le Pacifique et la fin de la guerre : Hiroshima, Nagasaki et la capitulation japonaise
+              </p>
+              
               <p>
-                Cet article présente un regard approfondi sur l'évolution du conflit et ses répercussions durables. En retraçant les étapes majeures de la Guerre du Pacifique, nous comprenons mieux les enjeux stratégiques et humains de ce chapitre.
+                Après l'attaque de Pearl Harbor en décembre 1941, les États-Unis entrent en guerre contre le Japon. Ce dernier, allié de l'Allemagne nazie, poursuit son expansion en Asie du Sud-Est. Pour contrer cette avancée, les États-Unis adoptent une stratégie de reconquête progressive des îles du Pacifique. Cette guerre, marquée par une extrême violence et de lourdes pertes humaines, culmine avec la bataille d'Okinawa au printemps 1945, qui laisse entrevoir le coût d'une invasion directe du Japon.
+              </p>
+              
+              <p>
+                En parallèle, les avancées scientifiques autour de l'énergie nucléaire débouchent sur le lancement du projet Manhattan, un programme secret américano-britannique visant à développer une arme nouvelle. Devant les inquiétudes liées aux recherches menées en Allemagne, les États-Unis s'investissent pleinement dès 1941 dans la conception de la bombe atomique. Une équipe spéciale de bombardement est formée, et une base d'opérations est installée sur l'île de Tinian, dans le Pacifique.
+              </p>
+              
+              <p>
+                En juillet 1945, alors que l'Allemagne a capitulé, la guerre se poursuit dans le Pacifique. Le Japon refuse les termes de la déclaration de Potsdam, dans laquelle les Alliés demandent sa reddition sans conditions. Dans ce contexte, les États-Unis préparent l'utilisation de leur nouvelle arme, considérée comme un moyen de forcer la fin rapide du conflit tout en évitant une invasion terrestre extrêmement coûteuse.
+              </p>
+              
+              
+              <blockquote class="article-quote">
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus lacinia odio vitae vestibulum vestibulum."
+                <cite>— Auteur Inconnu</cite>
+              </blockquote>
+            </div>
+          </div>
+        </article>
+      </section>
+      
+      <!-- Section Hiroshima avec animations d'apparition et carte interactive -->
+      <section class="step" id="hiroshima">
+        <div class="sticky-container">
+          <article class="text-container sticky-content">
+            <div class="section-badge">Point d'impact</div>
+            <h2>6 août 1945 - Hiroshima</h2>
+            <p class="intro-paragraph">
+              À 8h15, le bombardier américain <em>Enola Gay</em> largue "Little Boy", une bombe à uranium de 15 kilotonnes, à 580 mètres au-dessus de la ville.
+            </p>
+            <p>
+              La carte interactive montre l'étendue des dégâts :
+            </p>
+            <ul class="impact-legend">
+              <li><span class="impact-dot destruction"></span> <strong>Zones rouges :</strong> Destruction totale où l'onde de choc et la chaleur ont rasé tous les bâtiments.</li>
+              <li><span class="impact-dot partial"></span> <strong>Zones orange :</strong> Dommages structurels importants mais non totaux.</li>
+              <li><span class="impact-dot spared"></span> <strong>Zones vertes :</strong> Quartiers relativement épargnés par l'explosion directe.</li>
+            </ul>
+            <div class="stat-container">
+              <div class="stat-item">
+                <div class="stat-number">80,000+</div>
+                <div class="stat-label">Morts immédiats</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">70%</div>
+                <div class="stat-label">Ville détruite</div>
+              </div>
+            </div>
+            <div class="explore-prompt">
+              <p>Explorez la carte pour voir les différents niveaux de destruction</p>
+              <svg viewBox="0 0 24 24" width="24" height="24"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10zm0 0V12m0 0h7" fill="none" stroke="#C0392B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </article>
+        </div>
+      </section>
+      
+      <!-- Section Nagasaki avec animations d'apparition et carte interactive -->
+      <section class="step" id="nagasaki">
+        <div class="sticky-container">
+          <article class="text-container sticky-content">
+            <div class="section-badge">Second impact</div>
+            <h2>9 août 1945 - Nagasaki</h2>
+            <p class="intro-paragraph">
+              Trois jours après Hiroshima, "Fat Man", une bombe au plutonium de 21 kilotonnes, explose à 503 mètres au-dessus de Nagasaki.
+            </p>
+            <ul class="impact-legend">
+              <li><span class="impact-dot destruction"></span> <strong>Zones rouges :</strong> Épicentre et quartiers totalement détruits par l'explosion.</li>
+              <li><span class="impact-dot fire"></span> <strong>Zones orange :</strong> Secteurs ravagés par les incendies secondaires.</li>
+              <li><span class="impact-dot spared"></span> <strong>Zones vertes :</strong> Quartiers ayant échappé à la destruction massive.</li>
+            </ul>
+            <p>
+              La topographie vallonnée de Nagasaki a partiellement protégé certains quartiers, contrairement à Hiroshima située en plaine.
+            </p>
+            <div class="stat-container">
+              <div class="stat-item">
+                <div class="stat-number">40,000+</div>
+                <div class="stat-label">Victimes immédiates</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">6.7 km²</div>
+                <div class="stat-label">Zone dévastée</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+      
+      <!-- Section Infographie interactive -->
+      <section class="step" id="infographie-hiroshima">
+        <div class="infographie-container">
+          <article class="infographie-text">
+            <div class="section-badge">Données clés</div>
+            <h2>Les chiffres des bombardements</h2>
+            <p>
+              Cette infographie présente les données essentielles sur les deux bombardements atomiques de l'histoire.
+            </p>
+            <div class="infographie-tabs">
+              <button class="tab-btn active" data-target="tab-hiroshima">Hiroshima</button>
+              <button class="tab-btn" data-target="tab-nagasaki">Nagasaki</button>
+              <button class="tab-btn" data-target="tab-comparison">Comparaison</button>
+            </div>
+            <div id="tab-hiroshima" class="tab-content active">
+              <ul class="data-list">
+                <li><strong>Date :</strong> 6 août 1945 à 8h15</li>
+                <li><strong>Bombe :</strong> "Little Boy" (uranium 235)</li>
+                <li><strong>Puissance :</strong> 15 kilotonnes de TNT</li>
+                <li><strong>Altitude d'explosion :</strong> 580 mètres</li>
+                <li><strong>Victimes immédiates :</strong> 80 000 personnes</li>
+                <li><strong>Victimes totales :</strong> Environ 140 000 d'ici fin 1945</li>
+              </ul>
+            </div>
+            <div id="tab-nagasaki" class="tab-content">
+              <ul class="data-list">
+                <li><strong>Date :</strong> 9 août 1945 à 11h02</li>
+                <li><strong>Bombe :</strong> "Fat Man" (plutonium 239)</li>
+                <li><strong>Puissance :</strong> 21 kilotonnes de TNT</li>
+                <li><strong>Altitude d'explosion :</strong> 503 mètres</li>
+                <li><strong>Victimes immédiates :</strong> 40 000 personnes</li>
+                <li><strong>Victimes totales :</strong> Environ 70 000 d'ici fin 1945</li>
+              </ul>
+            </div>
+            <div id="tab-comparison" class="tab-content">
+              <p>Comparativement, la bombe de Nagasaki était techniquement plus puissante mais a fait moins de victimes en raison de la topographie vallonnée de la ville et d'une explosion légèrement décentrée par rapport à la zone la plus peuplée.</p>
+            </div>
+          </article>
+          <figure class="infographie-image">
+            <div class="infographie-interactive">
+              <div class="bomb-comparison">
+                <div class="bomb little-boy">
+                  <div class="bomb-name">Little Boy</div>
+                  <div class="bomb-shape"></div>
+                  <div class="bomb-data">15kt</div>
+                </div>
+                <div class="bomb fat-man">
+                  <div class="bomb-name">Fat Man</div>
+                  <div class="bomb-shape"></div>
+                  <div class="bomb-data">21kt</div>
+                </div>
+              </div>
+              <div class="blast-radius-comparison">
+                <div class="radius-circle hiroshima"></div>
+                <div class="radius-circle nagasaki"></div>
+                <div class="scale-indicator">
+                  <div class="scale-line"></div>
+                  <div class="scale-label">1 km</div>
+                </div>
+              </div>
+            </div>
+          </figure>
+        </div>
+      </section>
+      
+      <!-- Section texte ajoutée après "Données clés" -->
+      <section class="step" id="post-infographie-section">
+        <article class="article-container">
+          <div class="content-wrapper">
+            <div class="section-badge">Réflexion</div>
+            <h2 class="article-title">Impact des bombardements sur notre conscience collective</h2>
+            
+            <div class="article-content">
+              <p class="lead-paragraph">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum consequat diam vel tellus condimentum, vel tempor arcu efficitur.
+              </p>
+              
+              <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim.
+              </p>
+              
+              <p>
+                Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales hendrerit.
+              </p>
+              
+              <p>
+                Ut velit mauris, egestas sed, gravida nec, ornare ut, mi. Aenean ut orci vel massa suscipit pulvinar. Nulla sollicitudin. Fusce varius, ligula non tempus aliquam, nunc turpis ullamcorper nibh, in tempus sapien eros vitae ligula. Pellentesque rhoncus nunc et augue. Integer id felis. Curabitur aliquet pellentesque diam. Integer quis metus vitae elit lobortis egestas.
+              </p>
+              
+              <blockquote class="article-quote">
+                "Nam bibendum pellentesque quam a convallis. Sed ut vulputate nisi. Integer in felis sed leo vestibulum venenatis."
+                <cite>— Lorem Ipsum</cite>
+              </blockquote>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Section Conclusion avec image bandeau pleine largeur -->
+      <section class="step" id="conclusion">
+        <!-- Bandeau de césure pleine largeur -->
+        <div class="full-width-banner">
+          <img src="https://raw.githubusercontent.com/SIGATNguyen/Web_carto/main/carte_large_V3.png" alt="Illustration Thomas" />
+          <div class="image-credit">Illustration Thomas</div>
+        </div>
+        
+        <!-- Contenu centré avec texte justifié -->
+        <article class="article-container">
+          <div class="content-wrapper">
+            <div class="section-badge">Et aujourd'hui ?</div>
+            <h2 class="article-title">Little Boy sur Rennes</h2>
+            
+            <div class="article-content">
+              <p class="lead-paragraph">
+                Les bombardements d'Hiroshima et Nagasaki ont marqué non seulement la fin de la Seconde Guerre mondiale, mais aussi le début de l'ère atomique et d'une nouvelle forme de menace globale.
+              </p>
+              
+              <p>
+                Aujourd'hui, 80 ans après ces événements, ces deux villes se sont reconstruites tout en préservant certains vestiges comme témoignages pour les générations futures. Le Dôme de Genbaku à Hiroshima, resté debout malgré l'explosion, est devenu un symbole international de paix.
+              </p>
+              
+              <p>
+                La mémoire de ces événements continue d'influencer les relations internationales et la diplomatie mondiale. Le Japon, devenu un fervent défenseur du désarmement nucléaire, a fait de cette expérience traumatisante un pilier de son identité nationale. Les cérémonies annuelles de commémoration à Hiroshima et Nagasaki rassemblent des dignitaires du monde entier, rappelant à tous les conséquences dévastatrices de l'utilisation d'armes nucléaires.
+              </p>
+              
+              <p>
+                Les séquelles médicales, psychologiques et sociales de ces bombardements continuent d'être étudiées. Les "hibakusha", les survivants des bombardements atomiques, ont œuvré pendant des décennies pour témoigner de leur expérience et sensibiliser les nouvelles générations. Leurs récits, leurs souffrances et leur résilience constituent un héritage précieux pour l'humanité, nous rappelant constamment la fragilité de notre existence face aux armes de destruction massive.
+              </p>
+              
+            </div>
+          </div>
+        </article>
+      </section>
+      
+      <!-- Section Conclusion avec image bandeau pleine largeur -->
+      <section class="step" id="conclusion">
+        <!-- Bandeau de césure pleine largeur -->
+        <div class="full-width-banner">
+          <img src="https://paradigm-from-asia-africa.com/media/images/top/top_img_genbaku.jpg" alt="Dôme de Genbaku, Hiroshima" />
+          <div class="image-credit">Dôme de Genbaku, symbole de la paix à Hiroshima</div>
+        </div>
+        
+        <!-- Contenu centré avec texte justifié -->
+        <article class="article-container">
+          <div class="content-wrapper">
+            <div class="section-badge">Héritage</div>
+            <h2 class="article-title">Le poids de l'Histoire</h2>
+            
+            <div class="article-content">
+              <p class="lead-paragraph">
+                Les bombardements d'Hiroshima et Nagasaki ont marqué non seulement la fin de la Seconde Guerre mondiale, mais aussi le début de l'ère atomique et d'une nouvelle forme de menace globale.
+              </p>
+              
+              <p>
+                Aujourd'hui, 80 ans après ces événements, ces deux villes se sont reconstruites tout en préservant certains vestiges comme témoignages pour les générations futures. Le Dôme de Genbaku à Hiroshima, resté debout malgré l'explosion, est devenu un symbole international de paix.
+              </p>
+              
+              <p>
+                La mémoire de ces événements continue d'influencer les relations internationales et la diplomatie mondiale. Le Japon, devenu un fervent défenseur du désarmement nucléaire, a fait de cette expérience traumatisante un pilier de son identité nationale. Les cérémonies annuelles de commémoration à Hiroshima et Nagasaki rassemblent des dignitaires du monde entier, rappelant à tous les conséquences dévastatrices de l'utilisation d'armes nucléaires.
+              </p>
+              
+              <p>
+                Les séquelles médicales, psychologiques et sociales de ces bombardements continuent d'être étudiées. Les "hibakusha", les survivants des bombardements atomiques, ont œuvré pendant des décennies pour témoigner de leur expérience et sensibiliser les nouvelles générations. Leurs récits, leurs souffrances et leur résilience constituent un héritage précieux pour l'humanité, nous rappelant constamment la fragilité de notre existence face aux armes de destruction massive.
+              </p>
+              
+              <p>
+                Au-delà du bilan humain et matériel, ces événements ont profondément modifié notre conception du monde, instaurant ce que les historiens appellent "l'équilibre de la terreur" pendant la Guerre froide. La course aux armements qui a suivi, avec son corollaire de doctrines stratégiques comme la "destruction mutuelle assurée", a façonné les relations internationales pendant des décennies et continue d'influencer la géopolitique contemporaine.
+              </p>
+              
+              <blockquote class="article-quote">
+                "Pour que le mal triomphe, il suffit que les hommes de bien ne fassent rien."
+                <cite>— Edmund Burke</cite>
+              </blockquote>
+              
+              <p>
+                La question éthique soulevée par ces bombardements reste un sujet de débat historiographique intense. Entre nécessité militaire alléguée et considérations morales, l'Histoire continue d'interroger ces décisions et leurs conséquences. Ce questionnement permanent est peut-être l'héritage le plus précieux que nous pouvons transmettre aux générations futures.
               </p>
             </div>
-            <figure class="final-image">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/3/3d/Fat_Man_Assembled_Tinian_1945.jpg" alt="Fat Man Assembled Tinian 1945" />
-            </figure>
-          </article>
-        </section>
-    
-        <!-- Section Footer -->
-        <section id="footer">
-          <article class="footer-content">
-            <p>Sources &amp; Copyright</p>
-            <p>© 2025 MASTER SIGAT Université Rennes2. Ouest-France.</p>
-            <div class="footer-images">
-              <img src="https://media.ouest-france.fr/v1/documents/d5a06162881f47abde8ca2f7b57b769e-of.svg" alt="Logo Partenaire 1" />
-              <img src="https://media.ouest-france.fr/v1/documents/d5a06162881f47abde8ca2f7b57b769e-of.svg" alt="Logo Partenaire 2" />
+          </div>
+        </article>
+      </section>
+      
+      <!-- Section Footer -->
+      <section id="footer">
+        <article class="footer-content">
+          <div class="footer-logo">
+            <h3>Sources</h3>
+          </div>
+          <div class="footer-info">
+            <div class="footer-section">
+              <h3>À propos</h3>
+              <p>© 2025 2025 MASTER SIGAT - Université Rennes 2</p>
+              <p>En partenariat avec Ouest-France</p>
             </div>
-          </article>
-        </section>
-      </div>
-    </main>
-    
-    <!-- Inclusion des scripts JavaScript -->
-    <script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
-    <script src="https://unpkg.com/scrollama"></script>
-    <script src="script.js"></script>
-  </body>
-</html>
-<!-- partial -->
-  <script  src="./script.js"></script>
-
+            <div class="footer-section">
+              <h3>Sources</h3>
+              <p>Archives nationales américaines</p>
+              <p>Mémorial de la Paix d'Hiroshima</p>
+              <p>Centre d'études sur la bombe atomique de Nagasaki</p>
+            </div>
+            <div class="footer-section">
+              <h3>Technologies</h3>
+              <p>Développé avec MapLibre et Scrollama</p>
+              <a>TDonnées géospatiales : SIGAT</a>
+            </div>
+          </div>
+          <div class="copyright-info">
+            <p>Tous droits réservés.</p>
+          </div>
+        </article>
+      </section>
+      
+    </div>
+  </main>
+  
+  <!-- Scripts JS optimisés pour les performances -->
+  <script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/scrollama"></script>
+  <script src="./script.js"></script>
 </body>
 </html>
