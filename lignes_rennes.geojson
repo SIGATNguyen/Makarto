@@ -1,0 +1,9 @@
+{
+"type": "FeatureCollection",
+"name": "lignes_rennes",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "id": null, "km": 1.6 }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ -1.681067049783547, 48.109597745486589 ], [ -1.661818673920296, 48.109597745486589 ] ] ] } },
+{ "type": "Feature", "properties": { "id": null, "km": 3.0 }, "geometry": { "type": "MultiLineString", "coordinates": [ [ [ -1.681067049783547, 48.111341952392323 ], [ -1.641666804962653, 48.111413085657169 ] ] ] } }
+]
+}
