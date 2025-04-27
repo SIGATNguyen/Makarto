@@ -1,6 +1,5 @@
 // -----------------------------------------
-// SCRIPT MODIFIÉ POUR LE CLIENT
-// Suppression du curseur personnalisé et des éléments de navigation par chapitre
+// Ajout de la section Rennes et support pour la timeline avec images
 // -----------------------------------------
 
 // Fonction utilitaire pour détecter les appareils mobiles
@@ -48,8 +47,6 @@ function handleResize() {
     return;
   }
   
-  // SUPPRIMÉ: Gestion du curseur personnalisé
-  
   // Réinitialiser le scrollytelling à chaque redimensionnement significatif
   if (scroller && Math.abs(window.innerWidth - lastWidth) > 50) {
     scroller.resize();
@@ -61,7 +58,7 @@ function handleResize() {
 document.addEventListener('DOMContentLoaded', function() {
   const loadingIndicator = document.getElementById('loading-indicator');
   
-  // Force la fermeture du loader après 3 secondes maximum (optimisé de 5s à 3s)
+  // Force la fermeture du loader après 3 secondes maximum
   setTimeout(() => {
     if (loadingIndicator) {
       loadingIndicator.classList.add('hidden');
@@ -159,11 +156,25 @@ map.on('load', function() {
   addMapLayer('nagasaki_sauve', 
     'https://raw.githubusercontent.com/SIGATNguyen/Web_carto/refs/heads/main/Nagasaki/naga_sauve.geojson', 
     '#f39c9e');
+    
+  // --- Rennes (simulation fictive) ---
+  addMapLayer('rennes_detruit', 
+    'https://raw.githubusercontent.com/SIGATNguyen/Web_carto/refs/heads/main/tampon_1km6_4326.geojson', 
+    '#af0d1d');
+  
+  addMapLayer('rennes_partiel', 
+    'https://raw.githubusercontent.com/SIGATNguyen/Web_carto/refs/heads/main/tampon_3km_4326.geojson', 
+    '#ea504c');
+  
+  addMapLayer('rennes_radius', 
+    'https://raw.githubusercontent.com/SIGATNguyen/Web_carto/refs/heads/main/lignes_rennes.geojson', 
+    '#6B8E23');
 
   // Par défaut, on cache toutes les couches jusqu'à ce qu'on arrive à la section correspondante
   const allLayers = [
     'hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
-    'nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer'
+    'nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer',
+    'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer',
   ];
   
   allLayers.forEach(layer => {
@@ -182,7 +193,7 @@ map.on('load', function() {
       console.log("Section initiale détectée:", currentSection.id);
       handleStepEnter({ element: currentSection });
     }
-  }, 500); // Réduit de 1000ms à 500ms pour améliorer la réactivité
+  }, 500); // Réduit à 500ms pour améliorer la réactivité
 });
 
 // ======= LÉGENDE INTERACTIVE =======
@@ -197,6 +208,11 @@ function setupAllToggles() {
   setupToggle('toggle-naga-detruit-fixed');
   setupToggle('toggle-naga-feu-fixed');
   setupToggle('toggle-naga-sauve-fixed');
+  
+  // Rennes toggles (nouveaux)
+  setupToggle('toggle-rennes-detruit-fixed');
+  setupToggle('toggle-rennes-partiel-fixed');
+  setupToggle('toggle-rennes-radiation-fixed');
   
   console.log("Tous les boutons de légende ont été configurés");
 }
@@ -349,14 +365,14 @@ function handleStepEnter(response) {
   // Mémoriser la section actuelle
   currentSection = id;
   
-  // SUPPRIMÉ: Mise à jour de la navigation
-  
   // Masquer les légendes par défaut
   const legendHiroshima = document.getElementById("legend-hiroshima");
   const legendNagasaki = document.getElementById("legend-nagasaki");
+  const legendRennes = document.getElementById("legend-rennes");
   
   if (legendHiroshima) legendHiroshima.style.display = "none";
   if (legendNagasaki) legendNagasaki.style.display = "none";
+  if (legendRennes) legendRennes.style.display = "none";
   
   // Configuration spécifique par section avec couches visibles par défaut
   try {
@@ -365,28 +381,38 @@ function handleStepEnter(response) {
         map.flyTo({ center: [132.49859, 34.38477], zoom: 12.5, duration: 1500 });
         hideAllLayers();
         break;
+
+      // Nouvelle section pour la carte du Pacifique
+      case "pacific-map":
+        map.flyTo({ center: [160, 0], zoom: 3, duration: 1500 });
+        hideAllLayers();
+        break;
+        
+      // Nouvelle section pour le contexte du Pacifique
+      case "pacific-context":
+        map.flyTo({ center: [160, 0], zoom: 3, duration: 1500 });
+        hideAllLayers();
+        break;
       
       case "timeline":
         map.flyTo({ center: [135.5, 35.0], zoom: 6, duration: 1500 });
         hideAllLayers();
         break;
       
-      // Ajout de la nouvelle section lorem-section
       case "lorem-section":
-        map.flyTo({ center: [135, 36], zoom: 5, duration: 1500 });
+        map.flyTo({ center: [137.40184, 36.39750], zoom: 5, duration: 1500 });
         hideAllLayers();
         break;
       
       case "hiroshima":
-        map.flyTo({ center: [132.49214, 34.39090], zoom: 12.59, bearing: -8, pitch: 18, duration: 1500 });
+        map.flyTo({ center: [132.49214, 34.39090], zoom: 12.59, bearing: -8, pitch: 18, duration: 8000 });
         
-        // IMPORTANT: On montre la légende et on active toutes les couches immédiatement
+        // Montrer la légende et activer toutes les couches immédiatement
         if (legendHiroshima) {
           legendHiroshima.style.display = "block";
         }
         
         // Force l'affichage immédiat des couches d'Hiroshima
-        // Pas besoin d'attendre que la carte soit chargée
         ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer'].forEach(layer => {
           try {
             if (map.getLayer(layer)) {
@@ -398,8 +424,9 @@ function handleStepEnter(response) {
           }
         });
         
-        // Cache les couches de Nagasaki
-        ['nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer'].forEach(layer => {
+        // Cache les autres couches
+        ['nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer',
+         'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'].forEach(layer => {
           try {
             if (map.getLayer(layer)) {
               map.setLayoutProperty(layer, 'visibility', 'none');
@@ -412,9 +439,9 @@ function handleStepEnter(response) {
         break;
       
       case "nagasaki":
-        map.flyTo({ center: [129.87881, 32.75857], zoom: 13.2, bearing: -49.60, pitch: 34.50, duration: 1500 });
+        map.flyTo({ center: [129.87881, 32.75857], zoom: 13.2, bearing: -49.60, pitch: 34.50, duration: 8000 });
         
-        // IMPORTANT: On montre la légende et on active toutes les couches immédiatement
+        // Montrer la légende et activer toutes les couches immédiatement
         if (legendNagasaki) {
           legendNagasaki.style.display = "block";
         }
@@ -431,8 +458,9 @@ function handleStepEnter(response) {
           }
         });
         
-        // Cache les couches d'Hiroshima
-        ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer'].forEach(layer => {
+        // Cache les autres couches
+        ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
+         'rennes_detruit_layer', 'rennes_partiel_layer'].forEach(layer => {
           try {
             if (map.getLayer(layer)) {
               map.setLayoutProperty(layer, 'visibility', 'none');
@@ -447,6 +475,46 @@ function handleStepEnter(response) {
       case "infographie-hiroshima":
         map.flyTo({ center: [131.5, 33.5], zoom: 5, duration: 1500 });
         hideAllLayers();
+        break;
+      
+      case "post-infographie-section":
+        map.flyTo({ center: [135, 36], zoom: 5, duration: 1500 });
+        hideAllLayers();
+        break;
+      
+      // Nouvelle section pour Rennes
+      case "rennes-impact":
+        map.flyTo({ center: [-1.62366, 48.11567], zoom: 12.5, bearing: 0, pitch: 0, duration: 8000 });
+        
+        // Montrer la légende et activer toutes les couches immédiatement
+        if (legendRennes) {
+          legendRennes.style.display = "block";
+        }
+        
+        // Force l'affichage immédiat des couches de Rennes
+        ['rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'].forEach(layer => {
+          try {
+            if (map.getLayer(layer)) {
+              map.setLayoutProperty(layer, 'visibility', 'visible');
+              console.log(`Couche ${layer} affichée`);
+            }
+          } catch (error) {
+            console.error(`Erreur d'affichage de la couche ${layer}:`, error);
+          }
+        });
+        
+        // Cache les autres couches
+        ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
+         'nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer'].forEach(layer => {
+          try {
+            if (map.getLayer(layer)) {
+              map.setLayoutProperty(layer, 'visibility', 'none');
+            }
+          } catch (error) {}
+        });
+        
+        // Réinitialiser l'état des boutons de légende
+        resetLegendButtons('rennes');
         break;
       
       case "conclusion":
@@ -472,43 +540,23 @@ function handleStepExit(response) {
   
   const legendHiroshima = document.getElementById("legend-hiroshima");
   const legendNagasaki = document.getElementById("legend-nagasaki");
+  const legendRennes = document.getElementById("legend-rennes");
   
-  // Gérer la transition entre Timeline et Intro (masquer les légendes)
-  if (id === "timeline" && nextSectionId === "intro") {
+  // Gérer les transitions spécifiques
+  if ((id === "nagasaki" && nextSectionId === "infographie-hiroshima") ||
+      (id === "infographie-hiroshima" && nextSectionId === "post-infographie-section") ||
+      (id === "post-infographie-section" && nextSectionId === "rennes-impact") ||
+      (id === "rennes-impact" && nextSectionId === "conclusion")) {
     if (legendHiroshima) legendHiroshima.style.display = "none";
     if (legendNagasaki) legendNagasaki.style.display = "none";
-  }
-  // Gérer la transition entre Timeline et Lorem-section
-  else if (id === "timeline" && nextSectionId === "lorem-section") {
+    if (legendRennes) legendRennes.style.display = "none";
     hideAllLayers();
   }
-  // Gérer la transition entre Lorem-section et Timeline
-  else if (id === "lorem-section" && nextSectionId === "timeline") {
+  
+  // Gérer la transition entre Rennes et Post-Infographie (remontée)
+  else if (id === "rennes-impact" && nextSectionId === "post-infographie-section") {
+    if (legendRennes) legendRennes.style.display = "none";
     hideAllLayers();
-  }
-  // Gérer la transition entre Lorem-section et Hiroshima
-  else if (id === "lorem-section" && nextSectionId === "hiroshima") {
-    // La légende d'Hiroshima sera affichée par handleStepEnter
-  }
-  // Gérer la transition entre Hiroshima et Lorem-section (remontée)
-  else if (id === "hiroshima" && nextSectionId === "lorem-section") {
-    if (legendHiroshima) legendHiroshima.style.display = "none";
-    hideAllLayers();
-  }
-  // Gérer la transition entre Hiroshima et Nagasaki
-  else if (id === "hiroshima" && nextSectionId === "nagasaki") {
-    if (legendHiroshima) legendHiroshima.style.display = "none";
-    // Montrer la légende de Nagasaki sera fait dans handleStepEnter
-  }
-  // Gérer la transition entre Nagasaki et Infographie
-  else if (id === "nagasaki" && nextSectionId === "infographie-hiroshima") {
-    if (legendNagasaki) legendNagasaki.style.display = "none";
-    hideAllLayers();
-  }
-  // Gérer la transition entre Nagasaki et Hiroshima (remontée)
-  else if (id === "nagasaki" && nextSectionId === "hiroshima") {
-    if (legendNagasaki) legendNagasaki.style.display = "none";
-    // La légende d'Hiroshima sera affichée par handleStepEnter
   }
 }
 
@@ -525,8 +573,9 @@ function showHiroshimaLayers() {
     } catch (error) {}
   });
   
-  // Cacher les couches de Nagasaki
-  ['nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer'].forEach(layer => {
+  // Cacher les autres couches
+  ['nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer',
+   'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'].forEach(layer => {
     try {
       if (map.getLayer(layer)) {
         map.setLayoutProperty(layer, 'visibility', 'none');
@@ -548,8 +597,33 @@ function showNagasakiLayers() {
     } catch (error) {}
   });
   
-  // Cacher les couches d'Hiroshima
-  ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer'].forEach(layer => {
+  // Cacher les autres couches
+  ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
+   'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'].forEach(layer => {
+    try {
+      if (map.getLayer(layer)) {
+        map.setLayoutProperty(layer, 'visibility', 'none');
+      }
+    } catch (error) {}
+  });
+}
+
+// Fonction pour montrer uniquement les couches de Rennes
+function showRennesLayers() {
+  if (!map.loaded()) return;
+  
+  // Afficher les couches de Rennes
+  ['rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'].forEach(layer => {
+    try {
+      if (map.getLayer(layer)) {
+        map.setLayoutProperty(layer, 'visibility', 'visible');
+      }
+    } catch (error) {}
+  });
+  
+  // Cacher les autres couches
+  ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
+   'nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer'].forEach(layer => {
     try {
       if (map.getLayer(layer)) {
         map.setLayoutProperty(layer, 'visibility', 'none');
@@ -564,7 +638,8 @@ function hideAllLayers() {
   
   const allLayers = [
     'hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
-    'nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer'
+    'nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer',
+    'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'
   ];
   
   allLayers.forEach(layer => {
@@ -593,6 +668,16 @@ function resetLegendButtons(city) {
   } else if (city === 'nagasaki') {
     // Réinitialiser les boutons de Nagasaki
     ['toggle-naga-detruit-fixed', 'toggle-naga-feu-fixed', 'toggle-naga-sauve-fixed'].forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.classList.add('active');
+        btn.classList.remove('inactive');
+        btn.style.opacity = '1';
+      }
+    });
+  } else if (city === 'rennes') {
+    // Réinitialiser les boutons de Rennes
+    ['toggle-rennes-detruit-fixed', 'toggle-rennes-partiel-fixed', 'toggle-rennes-radiation-fixed'].forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) {
         btn.classList.add('active');
@@ -650,7 +735,7 @@ function initScrollytelling() {
           const index = Array.from(timelineItems).indexOf(entry.target);
           setTimeout(() => {
             entry.target.classList.add('visible');
-          }, index * 100); // Réduit à 100ms pour une animation plus rapide
+          }, index * 100); // Animation plus rapide
         }
       });
     }, { threshold: 0.25 });
@@ -660,11 +745,8 @@ function initScrollytelling() {
     });
     
     // Autres initialisations
-    // SUPPRIMÉ: initQuickNav();
     initTabs();
     initProgressBar();
-    
-    // SUPPRIMÉ: Initialisation du curseur personnalisé
     
     // Position initiale
     setTimeout(() => {
@@ -672,13 +754,11 @@ function initScrollytelling() {
       if (firstStep) {
         handleStepEnter({ element: firstStep });
       }
-    }, 300); // Réduit à 300ms pour une réactivité accrue
+    }, 300); // Réactivité accrue
   } catch (error) {
     console.error("Erreur d'initialisation du scrollytelling:", error);
   }
 }
-
-// ======= SUPPRIMÉ: NAVIGATION RAPIDE =======
 
 // ======= TABS POUR L'INFOGRAPHIE =======
 function initTabs() {
@@ -764,22 +844,19 @@ function initProgressBar() {
   }
 }
 
-// ======= SUPPRIMÉ: CURSEUR PERSONNALISÉ OPTIMISÉ =======
-
 // ======= INITIALISATION GÉNÉRALE =======
 document.addEventListener('DOMContentLoaded', function() {
   console.log("DOM chargé, initialisation...");
   
   // Initialiser les fonctionnalités de base
   initProgressBar();
-  // SUPPRIMÉ: initQuickNav();
   initTabs();
   
   // Précacher les ressources importantes
   precacheResources();
   
   // Gestion du redimensionnement
-  window.addEventListener('resize', debounce(handleResize, 150)); // Réduit à 150ms
+  window.addEventListener('resize', debounce(handleResize, 150));
   handleResize();
 });
 
@@ -787,9 +864,16 @@ document.addEventListener('DOMContentLoaded', function() {
 function precacheResources() {
   // Préchargement des images pour éviter les retards de rendu
   const urls = [
-    // SUPPRIMÉ: background image de l'intro
-    'https://upload.wikimedia.org/wikipedia/commons/3/3d/Fat_Man_Assembled_Tinian_1945.jpg',
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Genbaku_Dome_01.jpg/1280px-Genbaku_Dome_01.jpg'
+    'https://upload.wikimedia.org/wikipedia/commons/0/09/The_USS_Arizona_%28BB-39%29_burning_after_the_Japanese_attack_on_Pearl_Harbor_-_NARA_195617_-_Edit.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/a/a5/Battle_of_Midway%2C_June_1942_%2823-N-69293%29.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/7/75/Marines_of_the_28th_Regiment_of_the_5th_Division_raise_the_American_flag_atop_Mt._Suribachi%2C_Iwo_Jima%2C_on_Feb._23%2C_1945..jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/a/a8/Okinawa_Shuri_Castle_1945_US_Marines.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/7/78/Trinity_Shot_color.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/1/17/Potsdam_conference_1945-6.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/5/54/Atomic_bombing_of_Japan.jpg',
+    'https://upload.wikimedia.org/wikipedia/commons/c/c2/Nagasaki_bomb.jpg',
+    'https://paradigm-from-asia-africa.com/media/images/top/top_img_genbaku.jpg',
+    'https://raw.githubusercontent.com/SIGATNguyen/Web_carto/refs/heads/main/pacifique_sud.webp'
   ];
   
   urls.forEach(url => {
