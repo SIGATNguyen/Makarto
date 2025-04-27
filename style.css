@@ -27,9 +27,10 @@
   --text-white: #FFF;         /* Blanc pour le texte sur fond sombre */
   
   /* Couleurs fonctionnelles */
-  --success: #2E8B57;         /* Vert pour les zones sauvées */
-  --warning: #FFA500;         /* Orange pour les zones endommagées */
-  --danger: #B22222;          /* Rouge foncé pour les zones détruites */
+  --success: #f39c9e;         /* Vert pour les zones sauvées */
+  --warning: #ea504c;         /* Orange pour les zones endommagées */
+  --danger: #af0d1d;          /* Rouge foncé pour les zones détruites */
+  --radiation: #6B8E23;       /* Vert olive pour les zones de radiation */
   
   /* Dimensions */
   --header-height: 60px;
@@ -71,7 +72,6 @@ html, body {
 }
 
 body {
-  /* SUPPRIMÉ: cursor: none; - Réactivation du curseur par défaut */
   position: relative;
 }
 
@@ -100,10 +100,26 @@ p {
   line-height: 1.6;
 }
 
-/* ----- Correction pour les liens ----- */
+/* ----- Liens ----- */
 a {
+  color: var(--primary);
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
+.source-link {
   color: inherit;
-  text-decoration: none;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.source-link:hover {
+  color: var(--primary);
 }
 
 /* ----- Loader ----- */
@@ -261,9 +277,8 @@ a {
   transform: translateY(-3px);
 }
 
-/* ----- Intro Section - MODIFIÉ avec fond de couleur sobre ----- */
+/* ----- Intro Section ----- */
 .intro-background {
-  /* Remplacé l'image avec un fond de couleur sobre */
   background: var(--secondary);
   width: 100%;
   height: 100vh;
@@ -425,7 +440,135 @@ a {
   }
 }
 
-/* ----- Timeline Section Améliorée ----- */
+/* Styles pour la nouvelle section de la carte du Pacifique */
+#pacific-map {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#pacific-map .full-width-banner {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+#pacific-map .full-width-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#pacific-map .image-credit {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 15px;
+  font-size: 14px;
+  border-radius: 4px;
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+}
+
+/* Styles pour la section de contexte du Pacifique */
+#pacific-context {
+  background: white;
+  color: var(--text);
+  min-height: 100vh;
+  padding: 80px 0;
+}
+
+#pacific-context .article-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
+#pacific-context .content-wrapper {
+  padding: 0 20px;
+  text-align: center;
+}
+
+#pacific-context .section-badge {
+  display: inline-block;
+  background: #AF0D1D;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+
+#pacific-context .article-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: #1A1A1A;
+  line-height: 1.2;
+  text-align: center;
+}
+
+#pacific-context .article-content {
+  color: #333;
+  line-height: 1.6;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+/* Texte justifié */
+#pacific-context .article-content p {
+  text-align: justify;
+  hyphens: auto;
+}
+
+#pacific-context .lead-paragraph {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: #1A1A1A;
+}
+
+#pacific-context .article-quote {
+  margin: 30px auto;
+  padding: 20px 30px;
+  font-style: italic;
+  font-size: 20px;
+  border-left: 4px solid #AF0D1D;
+  border-right: 4px solid #AF0D1D;
+  background: #F6F6F6;
+  position: relative;
+  color: #333;
+  max-width: 550px;
+  text-align: center;
+}
+
+#pacific-context .article-quote::before {
+  content: '"';
+  position: absolute;
+  top: 0;
+  left: 10px;
+  font-size: 60px;
+  color: #AF0D1D;
+  opacity: 0.2;
+  line-height: 1;
+}
+
+#pacific-context .article-quote cite {
+  display: block;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+/* ----- Timeline Section Améliorée avec Images de chaque côté ----- */
 #timeline {
   background-color: var(--background-alt);
   padding: 80px 0 120px;
@@ -460,8 +603,8 @@ a {
   position: relative;
   margin: 0 auto;
   padding: 0;
-  width: 80%;
-  max-width: 1000px;
+  width: 90%;
+  max-width: 1200px;
 }
 
 /* Ligne verticale centrale - Améliorée */
@@ -483,60 +626,32 @@ a {
   box-shadow: var(--shadow-md);
 }
 
-/* Style de chaque élément (bloc événement) - Optimisé */
+/* Style de chaque élément (bloc événement) - Optimisé avec images */
 .timeline-item {
   position: relative;
-  width: 50%;
-  padding: 30px 40px;
-  box-sizing: border-box;
+  width: 100%;
   margin-bottom: 70px;
   opacity: 0;
   transform: translateY(30px);
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.timeline-item.left {
-  left: 0;
-  text-align: right;
-  padding-right: 60px;
+/* Contenu textuel et image des cartes */
+.timeline-content,
+.timeline-image {
+  width: 42%;
+  position: relative;
+  z-index: 1;
 }
 
-.timeline-item.right {
-  left: 50%;
-  text-align: left;
-  padding-left: 60px;
-}
-
-/* Élément central final - Optimisé */
-.timeline-item.center {
-  width: 80%;
-  left: 10%;
-  text-align: center;
-  padding: 30px;
-  z-index: 2;
-  margin-top: 30px;
-}
-
-.timeline-item.center .timeline-content {
-  margin: 0 auto;
-  max-width: 600px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 2px solid var(--primary);
-}
-
-/* Animation au scroll - Plus fluide */
-.timeline-item.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Contenu des cartes - Optimisé */
 .timeline-content {
   background: white;
   border: none;
   border-radius: 8px;
   padding: 25px;
-  position: relative;
   box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
   overflow: hidden;
@@ -546,6 +661,40 @@ a {
 .timeline-content:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-lg);
+}
+
+.timeline-image img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+  border: 3px solid white;
+}
+
+.timeline-image img:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Positionnement gauche-droite */
+.timeline-content.left,
+.timeline-image.left {
+  margin-right: 8%;
+  text-align: right;
+}
+
+.timeline-content.right,
+.timeline-image.right {
+  margin-left: 8%;
+  text-align: left;
+}
+
+.timeline-caption {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-top: 8px;
+  font-style: italic;
 }
 
 /* Bandeau coloré sur le côté - Optimisé */
@@ -558,12 +707,63 @@ a {
   background: var(--primary);
 }
 
-.timeline-item.left .timeline-content::after {
+.timeline-content.left::after {
   right: 0;
 }
 
-.timeline-item.right .timeline-content::after {
+.timeline-content.right::after {
   left: 0;
+}
+
+/* Animation au scroll - Plus fluide */
+.timeline-item.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Style pour les images doubles de l'événement final */
+.timeline-dual-image {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 30px;
+  width: 90%;
+}
+
+.timeline-image-left, .timeline-image-right {
+  width: 48%;
+}
+
+.timeline-image-left img, .timeline-image-right img {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+  border: 3px solid white;
+}
+
+.timeline-image-left img:hover, .timeline-image-right img:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Élément central final - Optimisé */
+.timeline-item.center {
+  width: 80%;
+  margin-left: 10%;
+  flex-direction: column;
+  text-align: center;
+  padding: 0;
+  z-index: 2;
+  margin-top: 30px;
+}
+
+.timeline-item.center .timeline-content {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--primary);
+  text-align: center;
 }
 
 .timeline-item.center .timeline-content::after {
@@ -590,11 +790,11 @@ a {
   background-color: var(--primary);
 }
 
-.timeline-item.left .timeline-title::after {
+.timeline-content.left .timeline-title::after {
   right: 0;
 }
 
-.timeline-item.right .timeline-title::after {
+.timeline-content.right .timeline-title::after {
   left: 0;
 }
 
@@ -638,6 +838,7 @@ a {
   content: '';
   position: absolute;
   top: 40px;
+  left: 50%;
   width: 20px;
   height: 20px;
   background: white;
@@ -646,6 +847,7 @@ a {
   z-index: 1;
   box-shadow: 0 0 0 4px rgba(175, 13, 29, 0.3);
   transition: all 0.3s ease;
+  transform: translateX(-50%);
 }
 
 /* Animation de pulsation - Optimisée */
@@ -665,27 +867,13 @@ a {
   animation: pulse 2s infinite;
 }
 
-/* Positionnement des points - Optimisé */
-.timeline-item.left::after {
-  right: -10px;
-}
-
-.timeline-item.right::after {
-  left: -10px;
-}
-
+/* Style pour l'élément central (Heure H) */
 .timeline-item.center::after {
-  left: 50%;
-  transform: translateX(-50%);
+  top: 10px;
   width: 30px;
   height: 30px;
   background: var(--primary);
   border: 4px solid white;
-}
-
-/* Suppression des traits connecteurs */
-.timeline-connector {
-  display: none;
 }
 
 /* Horloge pour "Heure H" - Optimisée */
@@ -727,11 +915,11 @@ a {
   transform: translate(-50%, -50%);
 }
 
-/* Styles pour la section lorem-section - Même style que conclusion */
+/* Styles pour la section lorem-section */
 #lorem-section {
   background: white;
   color: var(--text);
-  min-height: 100vh;
+  min-height: 60vh;
   padding: 80px 0;
 }
 
@@ -820,7 +1008,7 @@ a {
   font-size: 16px;
 }
 
-/* Styles pour la nouvelle section post-infographie */
+/* Styles pour la section post-infographie */
 #post-infographie-section {
   background: white;
   color: var(--text);
@@ -913,7 +1101,7 @@ a {
   font-size: 16px;
 }
 
-/* ----- Sticky Container (Hiroshima & Nagasaki) ----- */
+/* ----- Sticky Container (Hiroshima, Nagasaki et Rennes) ----- */
 .sticky-container {
   position: sticky;
   top: 0;
@@ -990,8 +1178,12 @@ a {
   background: var(--warning);
 }
 
-.impact-dot.spared {
+.impact-dot.spared, .impact-dot.radiation {
   background: var(--success);
+}
+
+.impact-dot.radiation {
+  background: var(--radiation);
 }
 
 /* Conteneur de statistiques */
@@ -1031,7 +1223,12 @@ a {
 .explore-prompt {
   background: var(--secondary-light);
   color: white;
+  padding: 15px;
   border-radius: 8px;
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   animation: glow 3s infinite alternate;
 }
 
@@ -1044,9 +1241,10 @@ a {
   }
 }
 
-/* ----- Sections Hiroshima & Nagasaki ----- */
+/* ----- Sections Hiroshima, Nagasaki et Rennes Impact ----- */
 #hiroshima,
-#nagasaki {
+#nagasaki,
+#rennes-impact {
   min-height: 200vh;
 }
 
@@ -1281,7 +1479,7 @@ a {
   font-size: 0.9rem;
 }
 
-/* ----- Conclusion Section MODIFIÉE ----- */
+/* ----- Conclusion Section ----- */
 #conclusion {
   background: white;
   color: var(--text);
@@ -1405,7 +1603,7 @@ a {
   font-size: 16px;
 }
 
-/* ----- Footer Section - MODIFIÉE pour le client ----- */
+/* ----- Footer Section ----- */
 #footer {
   background: var(--secondary);
   color: white;
@@ -1468,7 +1666,6 @@ a {
   color: #ccc;
 }
 
-/* REMPLACÉ: portfolio-link avec copyright-info */
 .copyright-info {
   text-align: center;
   margin-top: 20px;
@@ -1598,6 +1795,25 @@ a {
     flex-direction: column;
     gap: 15px;
   }
+  
+  /* Responsive pour la timeline */
+  .timeline-item {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .timeline-content, .timeline-image {
+    width: 80%;
+    margin: 0 0 20px 0 !important;
+    text-align: center !important;
+  }
+  
+  .timeline-content.left .timeline-title::after,
+  .timeline-content.right .timeline-title::after {
+    left: 50%;
+    transform: translateX(-50%);
+    right: auto;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1673,29 +1889,21 @@ a {
     padding: 0 15px;
   }
   
-  #lorem-section .article-title {
+  #lorem-section .article-title,
+  #post-infographie-section .article-title,
+  #pacific-context .article-title {
     font-size: 24px;
   }
   
-  #lorem-section .lead-paragraph {
+  #lorem-section .lead-paragraph,
+  #post-infographie-section .lead-paragraph,
+  #pacific-context .lead-paragraph {
     font-size: 16px;
   }
   
-  #lorem-section .article-quote {
-    font-size: 18px;
-    padding: 15px 20px;
-  }
-  
-  /* Ajout des styles responsifs pour la nouvelle section */
-  #post-infographie-section .article-title {
-    font-size: 24px;
-  }
-  
-  #post-infographie-section .lead-paragraph {
-    font-size: 16px;
-  }
-  
-  #post-infographie-section .article-quote {
+  #lorem-section .article-quote,
+  #post-infographie-section .article-quote,
+  #pacific-context .article-quote {
     font-size: 18px;
     padding: 15px 20px;
   }
@@ -1707,7 +1915,7 @@ a {
 
 @media (max-width: 600px) {
   body {
-    cursor: auto; /* Restaurer le curseur par défaut sur mobile */
+    cursor: auto;
   }
   
   .intro-title {
@@ -1729,48 +1937,42 @@ a {
   }
   
   /* Adaptation responsive pour la timeline */
+  .timeline {
+    width: 95%;
+  }
+  
   .timeline-item {
     width: 100%;
     padding-left: 50px;
     padding-right: 15px;
     left: 0 !important;
     text-align: left !important;
+    margin-bottom: 40px;
   }
   
-  .timeline-item.left::after,
-  .timeline-item.right::after {
+  .timeline-content, .timeline-image {
+    width: 100% !important;
+  }
+  
+  .timeline-item::after {
     left: 12px;
     right: auto;
   }
   
-  .timeline-item.left .timeline-content::after,
-  .timeline-item.right .timeline-content::after {
+  .timeline-content.left::after,
+  .timeline-content.right::after {
     left: 0;
     right: auto;
   }
   
-  .timeline-item.left .timeline-title::after,
-  .timeline-item.right .timeline-title::after {
-    left: 0;
-    right: auto;
-  }
-  
-  /* Adaptation responsive pour l'élément central de la timeline */
-  .timeline-item.center {
+  .timeline-dual-image {
+    flex-direction: column;
     width: 100%;
-    left: 0;
-    padding-left: 50px;
-    text-align: left;
   }
   
-  .timeline-item.center::after {
-    left: 12px;
-    transform: none;
-  }
-  
-  .timeline-item.center .timeline-title::after {
-    left: 0;
-    transform: none;
+  .timeline-image-left, .timeline-image-right {
+    width: 100%;
+    margin-bottom: 15px;
   }
   
   .sticky-content {
@@ -1802,7 +2004,7 @@ a {
     height: 4px;
   }
   
-  /* Make legends more mobile-friendly */
+  /* Rendre les légendes adaptées au mobile */
   #fixed-legend {
     width: calc(100% - 20px);
     text-align: center;
@@ -1829,6 +2031,18 @@ a {
   
   .clock-hand {
     width: 25px;
+  }
+
+  /* Ajustements pour la section de la carte du Pacifique sur mobile */
+  #pacific-map .full-width-banner {
+    height: 50vh !important;
+  }
+  
+  #pacific-map .image-credit {
+    font-size: 12px;
+    padding: 5px 10px;
+    bottom: 10px;
+    right: 10px;
   }
 }
 
@@ -1868,26 +2082,7 @@ a {
   opacity: 0.5 !important;
 }
 
-/* ----- Attention, ces styles concernent le mode sombre (préparés mais non activés) ----- */
-.dark-mode {
-  --primary: #FF4D4D;
-  --primary-light: #FF7777;
-  --primary-dark: #CC0000;
-  
-  --secondary: #F5F5F5;
-  --secondary-light: #FFFFFF;
-  --secondary-lighter: #EEEEEE;
-  
-  --background: #121212;
-  --background-alt: #1E1E1E;
-  
-  --text: #F5F5F5;
-  --text-light: #CCCCCC;
-  --text-lighter: #999999;
-  --text-white: #FFFFFF;
-}
-
-/* Modification pour permettre le scroll sur mobile */
+/* ----- Modification pour permettre le scroll sur mobile ----- */
 @media (max-width: 768px) {
   html, body {
     overflow: auto !important; /* Réactiver le scroll natif sur mobile */
@@ -1928,5 +2123,39 @@ a {
   
   .full-width-banner {
     height: 200px !important;
+  }
+}
+
+/* Style pour la section des logos */
+.footer-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  margin-top: 20px;
+}
+
+.footer-logo-img {
+  height: 60px; /* Logo plus grand */
+  width: auto;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+/* Style spécifique pour le logo SIGAT */
+.footer-logos img[src*="Logo_sigat.svg"] {
+  filter: brightness(0) invert(1); /* Convertit le logo noir en blanc */
+  height: 80px; /* Logo SIGAT encore plus grand */
+}
+
+.footer-logo-img:hover {
+  opacity: 1;
+}
+
+/* Responsive design pour les logos */
+@media (max-width: 768px) {
+  .footer-logos {
+    flex-direction: column;
+    gap: 15px;
   }
 }
