@@ -1350,7 +1350,7 @@ a:hover {
   color: var(--secondary);
 }
 
-/* Partie interactive de l'infographie */
+/* Partie interactive de l'infographie - SIMPLIFIÉE */
 .infographie-image {
   flex: 0 0 60%;
 }
@@ -1363,120 +1363,68 @@ a:hover {
   height: 500px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
   position: relative;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
 
-.bomb-comparison {
+/* Affichage des bombes */
+.bomb-display {
   display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
-  height: 220px;
-  margin-bottom: 20px;
-}
-
-.bomb {
-  display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  text-align: center;
-  transition: transform 0.3s ease;
+  height: 100%;
+  width: 100%;
+  position: relative;
 }
 
-.bomb:hover {
+.bomb-display img {
+  max-height: 300px;
+  max-width: 100%;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.bomb-display img:hover {
   transform: translateY(-10px);
 }
 
-.bomb-name {
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.bomb-shape {
-  width: 100px;
-  height: 160px;
-  background: var(--primary);
-  position: relative;
-  margin-bottom: 15px;
-}
-
-.little-boy .bomb-shape {
-  width: 70px;
-  border-radius: 20px;
-}
-
-.fat-man .bomb-shape {
-  width: 110px;
-  height: 140px;
-  border-radius: 50%;
-}
-
-.bomb-data {
-  font-size: 1.5rem;
-  font-weight: bold;
-}
-
-.blast-radius-comparison {
-  position: relative;
-  height: 240px;
+.bomb-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
   width: 100%;
-}
-
-.radius-circle {
-  position: absolute;
-  border: 2px dashed white;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.radius-circle.hiroshima {
-  top: 50%;
-  left: 40%;
-  width: 180px;
-  height: 180px;
-  border-color: rgba(255, 255, 255, 0.8);
-  animation: pulse-radius 3s infinite alternate;
-}
-
-.radius-circle.nagasaki {
-  top: 50%;
-  left: 60%;
-  width: 220px;
-  height: 220px;
-  border-color: rgba(255, 255, 255, 0.6);
-  animation: pulse-radius 3s 0.5s infinite alternate;
-}
-
-@keyframes pulse-radius {
-  0% {
-    box-shadow: 0 0 0 0 rgba(175, 13, 29, 0.4);
-    border-color: rgba(255, 255, 255, 0.6);
-  }
-  100% {
-    box-shadow: 0 0 20px 10px rgba(175, 13, 29, 0.2);
-    border-color: rgba(255, 255, 255, 1);
-  }
-}
-
-.scale-indicator {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px;
   text-align: center;
+  border-radius: 0 0 8px 8px;
 }
 
-.scale-line {
-  width: 100px;
-  height: 3px;
-  background: white;
-  margin: 0 auto 5px;
+.bomb-info span {
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
-.scale-label {
-  font-size: 0.9rem;
+.bomb-info .bomb-power {
+  color: var(--primary-light);
+  margin-left: 10px;
+}
+
+/* Animations pour les bombes */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-bomb {
+  animation: fadeInScale 0.5s ease forwards;
 }
 
 /* ----- Conclusion Section ----- */
@@ -1854,13 +1802,9 @@ a:hover {
     padding: 20px;
   }
   
-  .bomb-comparison {
+  .bomb-display {
     height: auto;
     margin-bottom: 40px;
-  }
-  
-  .blast-radius-comparison {
-    height: 300px;
   }
   
   .footer-info {
@@ -2157,5 +2101,134 @@ a:hover {
   .footer-logos {
     flex-direction: column;
     gap: 15px;
+  }
+}
+
+/* Styles pour l'infographie des bombes - Version simplifiée */
+
+/* Augmenter la hauteur de la section interactive pour qu'elle soit plus en accord avec la hauteur du texte */
+.infographie-interactive {
+  height: 600px !important; /* Augmenté pour s'adapter au contenu du texte */
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Style pour le conteneur principal des bombes */
+.bomb-display {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Style pour le conteneur de chaque bombe */
+.bomb-container {
+  position: relative;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Agrandir les images des bombes */
+.bomb-container img {
+  max-height: 450px; /* Augmenté pour plus de visibilité */
+  width: auto;
+  filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.3));
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.bomb-container img:hover {
+  transform: translateY(-5px);
+  filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.5));
+}
+
+/* Style pour le titre sous les bombes */
+.bomb-title {
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  width: 100%;
+  padding: 10px 15px;
+  text-align: center;
+  border-radius: 4px;
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bomb-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.bomb-power {
+  color: #ff4d4d;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+/* Style pour la comparaison des bombes */
+.bombs-comparison {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+/* Animation pour l'apparition des bombes */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-bomb {
+  animation: fadeInScale 0.5s ease forwards;
+}
+
+/* Ajustements responsive */
+@media (max-width: 1200px) {
+  .bombs-comparison {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .bomb-container {
+    width: 100%;
+  }
+  
+  .bomb-container img {
+    max-height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .infographie-interactive {
+    height: auto !important;
+    min-height: 500px;
+  }
+  
+  .bomb-container img {
+    max-height: 250px;
+  }
+  
+  .bomb-name {
+    font-size: 1.2rem;
+  }
+  
+  .bomb-power {
+    font-size: 1rem;
   }
 }
