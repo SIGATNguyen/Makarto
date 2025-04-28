@@ -614,8 +614,7 @@ function showRennesLayers() {
   
   // Afficher les couches de Rennes
   ['rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'].forEach(layer => {
-    try {
-      if (map.getLayer(layer)) {
+    try {if (map.getLayer(layer)) {
         map.setLayoutProperty(layer, 'visibility', 'visible');
       }
     } catch (error) {}
@@ -747,6 +746,7 @@ function initScrollytelling() {
     // Autres initialisations
     initTabs();
     initProgressBar();
+    initBombInfographic(); // Nouvelle fonction pour les infographies de bombes
     
     // Position initiale
     setTimeout(() => {
@@ -781,8 +781,74 @@ function initTabs() {
       if (targetContent) {
         targetContent.classList.add('active');
       }
+      
+      // Mettre à jour l'affichage de la bombe
+      updateBombDisplay(targetId);
     });
   });
+}
+
+// ======= Gestion de l'affichage des bombes =======
+function initBombInfographic() {
+  // Initialiser le contenu avec l'image de Little Boy (Hiroshima est l'onglet par défaut)
+  updateBombDisplay('tab-hiroshima');
+}
+
+// Version simplifiée qui n'affiche que l'image et le titre
+function updateBombDisplay(tabId) {
+  const bombDisplay = document.getElementById('bomb-display');
+  
+  if (!bombDisplay) {
+    console.warn("Élément bomb-display non trouvé");
+    return;
+  }
+  
+  let bombHtml = '';
+  
+  switch(tabId) {
+    case 'tab-hiroshima':
+      bombHtml = `
+        <div class="bomb-container animate-bomb">
+          <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/LITTLEBOY.png" alt="Little Boy - Bombe d'Hiroshima">
+          <div class="bomb-title">
+            <span class="bomb-name">Little Boy</span>
+          </div>
+        </div>
+      `;
+      break;
+    case 'tab-nagasaki':
+      bombHtml = `
+        <div class="bomb-container animate-bomb">
+          <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/FATMAN.png" alt="Fat Man - Bombe de Nagasaki">
+          <div class="bomb-title">
+            <span class="bomb-name">Fat Man</span>
+          </div>
+        </div>
+      `;
+      break;
+    case 'tab-comparison':
+      bombHtml = `
+        <div class="bombs-comparison animate-bomb">
+          <div class="bomb-container" style="margin-right: 40px;">
+            <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/LITTLEBOY.png" alt="Little Boy - Bombe d'Hiroshima">
+            <div class="bomb-title">
+              <span class="bomb-name">Little Boy</span>
+            </div>
+          </div>
+          <div class="bomb-container">
+            <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/FATMAN.png" alt="Fat Man - Bombe de Nagasaki">
+            <div class="bomb-title">
+              <span class="bomb-name">Fat Man</span>
+            </div>
+          </div>
+        </div>
+      `;
+      break;
+    default:
+      bombHtml = `<p>Information non disponible</p>`;
+  }
+  
+  bombDisplay.innerHTML = bombHtml;
 }
 
 // ======= BARRE DE PROGRESSION OPTIMISÉE POUR MOBILE =======
@@ -864,6 +930,8 @@ document.addEventListener('DOMContentLoaded', function() {
 function precacheResources() {
   // Préchargement des images pour éviter les retards de rendu
   const urls = [
+    'https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/LITTLEBOY.png',
+    'https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/FATMAN.png',
     'https://upload.wikimedia.org/wikipedia/commons/0/09/The_USS_Arizona_%28BB-39%29_burning_after_the_Japanese_attack_on_Pearl_Harbor_-_NARA_195617_-_Edit.jpg',
     'https://upload.wikimedia.org/wikipedia/commons/a/a5/Battle_of_Midway%2C_June_1942_%2823-N-69293%29.jpg',
     'https://upload.wikimedia.org/wikipedia/commons/7/75/Marines_of_the_28th_Regiment_of_the_5th_Division_raise_the_American_flag_atop_Mt._Suribachi%2C_Iwo_Jima%2C_on_Feb._23%2C_1945..jpg',
