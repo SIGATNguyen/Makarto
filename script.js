@@ -101,6 +101,12 @@ map.on('load', function() {
   
   // Démarrer les animations
   startIntroAnimations();
+
+  // Ajouter le contrôle d'échelle ici
+  map.addControl(new maplibregl.ScaleControl({
+    maxWidth: 100,
+    unit: 'metric'
+  }), 'bottom-left');
   
   // Fonction pour ajouter des couches - toutes les couches sont créées avec visibilité 'visible'
   function addMapLayer(id, url, color, opacity = 0.8) {
