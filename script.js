@@ -82,6 +82,14 @@ var map = new maplibregl.Map({
   preserveDrawingBuffer: false
 });
 
+// Popup pour les points d'intérêt
+const poiPopup = new maplibregl.Popup({
+  closeButton: false,
+  closeOnClick: false,
+  offset: [0, -10],
+  className: 'poi-popup'
+});
+
 // Gestion des erreurs de la carte
 map.on('error', function(e) {
   console.error('Erreur MapLibre:', e);
@@ -176,11 +184,15 @@ map.on('load', function() {
     'https://raw.githubusercontent.com/SIGATNguyen/Web_carto/refs/heads/main/lignes_rennes.geojson', 
     '#6B8E23');
 
+  // Ajout des points d'intérêt
+  addPointsOfInterest();
+
   // Par défaut, on cache toutes les couches jusqu'à ce qu'on arrive à la section correspondante
   const allLayers = [
     'hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
     'nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer',
     'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer',
+    'poi_points', 'poi_labels'
   ];
   
   allLayers.forEach(layer => {
@@ -202,6 +214,80 @@ map.on('load', function() {
   }, 500); // Réduit à 500ms pour améliorer la réactivité
 });
 
+// Fonction pour ajouter les points d'intérêt
+function addPointsOfInterest() {
+  try {
+    // Ajouter la source de données pour les points d'intérêt
+    map.addSource('poi_source', {
+      type: 'geojson',
+      data: 'https://raw.githubusercontent.com/SIGATNguyen/Makarto/refs/heads/main/poi_int.geojson'
+    });
+    
+    // Ajouter une couche pour les points
+    map.addLayer({
+      id: 'poi_points',
+      type: 'circle',
+      source: 'poi_source',
+      paint: {
+        'circle-radius': 6,
+        'circle-color': '#AF0D1D',
+        'circle-stroke-width': 2,
+        'circle-stroke-color': '#FFFFFF',
+        'circle-opacity': 0.8
+      },
+      layout: {
+        'visibility': 'none' // Caché par défaut
+      }
+    });
+    
+    // Ajouter une couche pour les labels des points
+    map.addLayer({
+      id: 'poi_labels',
+      type: 'symbol',
+      source: 'poi_source',
+      layout: {
+        'text-field': ['get', 'nom'],
+        'text-font': ['Open Sans Regular'],
+        'text-size': 12,
+        'text-offset': [0, -2],
+        'text-anchor': 'bottom',
+        'visibility': 'none' // Caché par défaut
+      },
+      paint: {
+        'text-color': '#FFFFFF',
+        'text-halo-color': '#000000',
+        'text-halo-width': 1.5
+      }
+    });
+    
+    console.log("Points d'intérêt ajoutés avec succès");
+    
+    // Ajouter les interactions de survol
+    // Quand la souris passe sur un point
+    map.on('mouseenter', 'poi_points', (e) => {
+      map.getCanvas().style.cursor = 'pointer';
+      
+      const coordinates = e.features[0].geometry.coordinates.slice();
+      const name = e.features[0].properties.nom;
+      
+      // Positionner la popup et l'afficher
+      poiPopup
+        .setLngLat(coordinates)
+        .setHTML(`<div class="poi-popup-content">${name}</div>`)
+        .addTo(map);
+    });
+    
+    // Quand la souris quitte un point
+    map.on('mouseleave', 'poi_points', () => {
+      map.getCanvas().style.cursor = '';
+      poiPopup.remove();
+    });
+    
+  } catch (error) {
+    console.error("Erreur lors de l'ajout des points d'intérêt:", error);
+  }
+}
+
 // ======= LÉGENDE INTERACTIVE =======
 // Fonction pour configurer tous les toggles
 function setupAllToggles() {
@@ -219,6 +305,9 @@ function setupAllToggles() {
   setupToggle('toggle-rennes-detruit-fixed');
   setupToggle('toggle-rennes-partiel-fixed');
   setupToggle('toggle-rennes-radiation-fixed');
+  
+  // Ajout d'un toggle pour les points d'intérêt
+  setupTogglePoints('toggle-poi-fixed');
   
   console.log("Tous les boutons de légende ont été configurés");
 }
@@ -264,6 +353,43 @@ function setupToggle(btnId) {
       }
     } catch (error) {
       console.error(`Erreur lors du toggle de ${layer}:`, error);
+    }
+  });
+}
+
+// Fonction pour configurer le toggle des points d'intérêt
+function setupTogglePoints(btnId) {
+  const btn = document.getElementById(btnId);
+  if (!btn) {
+    console.warn(`Bouton ${btnId} non trouvé`);
+    return;
+  }
+  
+  console.log(`Bouton de légende pour les points configuré: ${btnId}`);
+  
+  btn.addEventListener('click', function() {
+    const isActive = btn.classList.contains('active');
+    
+    try {
+      // Basculer la visibilité des points et des labels
+      const newVisibility = isActive ? 'none' : 'visible';
+      map.setLayoutProperty('poi_points', 'visibility', newVisibility);
+      map.setLayoutProperty('poi_labels', 'visibility', newVisibility);
+      
+      // Mettre à jour les classes CSS
+      if (isActive) {
+        btn.classList.remove('active');
+        btn.classList.add('inactive');
+        btn.style.opacity = '0.5';
+      } else {
+        btn.classList.add('active');
+        btn.classList.remove('inactive');
+        btn.style.opacity = '1';
+      }
+      
+      console.log(`Visibilité des points d'intérêt définie à ${newVisibility}`);
+    } catch (error) {
+      console.error(`Erreur lors du toggle des points d'intérêt:`, error);
     }
   });
 }
@@ -430,6 +556,15 @@ function handleStepEnter(response) {
           }
         });
         
+        // Activation des points d'intérêt pour Hiroshima
+        try {
+          map.setLayoutProperty('poi_points', 'visibility', 'visible');
+          // Labels visibles seulement au survol
+          resetPoiToggleButton(true);
+        } catch (error) {
+          console.error("Erreur d'affichage des points d'intérêt:", error);
+        }
+        
         // Cache les autres couches
         ['nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer',
          'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'].forEach(layer => {
@@ -463,6 +598,14 @@ function handleStepEnter(response) {
             console.error(`Erreur d'affichage de la couche ${layer}:`, error);
           }
         });
+        
+        // Activation des points d'intérêt pour Nagasaki
+        try {
+          map.setLayoutProperty('poi_points', 'visibility', 'visible');
+          resetPoiToggleButton(true);
+        } catch (error) {
+          console.error("Erreur d'affichage des points d'intérêt:", error);
+        }
         
         // Cache les autres couches
         ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
@@ -509,6 +652,13 @@ function handleStepEnter(response) {
           }
         });
         
+        // Cache les points d'intérêt pour Rennes
+        try {
+          map.setLayoutProperty('poi_points', 'visibility', 'none');
+          map.setLayoutProperty('poi_labels', 'visibility', 'none');
+          resetPoiToggleButton(false);
+        } catch (error) {}
+        
         // Cache les autres couches
         ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
          'nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer'].forEach(layer => {
@@ -530,6 +680,22 @@ function handleStepEnter(response) {
     }
   } catch (error) {
     console.error("Erreur lors du changement de section:", error);
+  }
+}
+
+// Fonction pour réinitialiser le bouton de toggle des points d'intérêt
+function resetPoiToggleButton(active) {
+  const btn = document.getElementById('toggle-poi-fixed');
+  if (btn) {
+    if (active) {
+      btn.classList.add('active');
+      btn.classList.remove('inactive');
+      btn.style.opacity = '1';
+    } else {
+      btn.classList.remove('active');
+      btn.classList.add('inactive');
+      btn.style.opacity = '0.5';
+    }
   }
 }
 
@@ -579,6 +745,12 @@ function showHiroshimaLayers() {
     } catch (error) {}
   });
   
+  // Afficher les points d'intérêt
+  try {
+    map.setLayoutProperty('poi_points', 'visibility', 'visible');
+    resetPoiToggleButton(true);
+  } catch (error) {}
+  
   // Cacher les autres couches
   ['nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer',
    'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'].forEach(layer => {
@@ -603,6 +775,12 @@ function showNagasakiLayers() {
     } catch (error) {}
   });
   
+  // Afficher les points d'intérêt
+  try {
+    map.setLayoutProperty('poi_points', 'visibility', 'visible');
+    resetPoiToggleButton(true);
+  } catch (error) {}
+  
   // Cacher les autres couches
   ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
    'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'].forEach(layer => {
@@ -626,6 +804,13 @@ function showRennesLayers() {
     } catch (error) {}
   });
   
+  // Cacher les points d'intérêt pour Rennes
+  try {
+    map.setLayoutProperty('poi_points', 'visibility', 'none');
+    map.setLayoutProperty('poi_labels', 'visibility', 'none');
+    resetPoiToggleButton(false);
+  } catch (error) {}
+  
   // Cacher les autres couches
   ['hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
    'nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer'].forEach(layer => {
@@ -644,7 +829,8 @@ function hideAllLayers() {
   const allLayers = [
     'hiroshima_detruit_layer', 'hiroshima_moinsdetruit_layer', 'hiroshima_sauve_layer',
     'nagasaki_detruit_layer', 'nagasaki_feu_layer', 'nagasaki_sauve_layer',
-    'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer'
+    'rennes_detruit_layer', 'rennes_partiel_layer', 'rennes_radius_layer',
+    'poi_points', 'poi_labels'
   ];
   
   allLayers.forEach(layer => {
@@ -800,7 +986,7 @@ function initBombInfographic() {
   updateBombDisplay('tab-hiroshima');
 }
 
-// Version simplifiée qui n'affiche que l'image et le titre
+// Mise à jour de la fonction pour utiliser les nouvelles images fournies
 function updateBombDisplay(tabId) {
   const bombDisplay = document.getElementById('bomb-display');
   
@@ -815,7 +1001,7 @@ function updateBombDisplay(tabId) {
     case 'tab-hiroshima':
       bombHtml = `
         <div class="bomb-container animate-bomb">
-          <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/LITTLEBOY.png" alt="Little Boy - Bombe d'Hiroshima">
+          <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/little_boy_hiroshima.svg.png" alt="Little Boy - Bombe d'Hiroshima">
           <div class="bomb-title">
             <span class="bomb-name">Little Boy</span>
           </div>
@@ -825,7 +1011,7 @@ function updateBombDisplay(tabId) {
     case 'tab-nagasaki':
       bombHtml = `
         <div class="bomb-container animate-bomb">
-          <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/FATMAN.png" alt="Fat Man - Bombe de Nagasaki">
+          <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/fat_man_Nagasaki.png" alt="Fat Man - Bombe de Nagasaki">
           <div class="bomb-title">
             <span class="bomb-name">Fat Man</span>
           </div>
@@ -835,18 +1021,7 @@ function updateBombDisplay(tabId) {
     case 'tab-comparison':
       bombHtml = `
         <div class="bombs-comparison animate-bomb">
-          <div class="bomb-container" style="margin-right: 40px;">
-            <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/LITTLEBOY.png" alt="Little Boy - Bombe d'Hiroshima">
-            <div class="bomb-title">
-              <span class="bomb-name">Little Boy</span>
-            </div>
-          </div>
-          <div class="bomb-container">
-            <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/FATMAN.png" alt="Fat Man - Bombe de Nagasaki">
-            <div class="bomb-title">
-              <span class="bomb-name">Fat Man</span>
-            </div>
-          </div>
+          <img src="https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/deux_bombes.png" alt="Comparaison des bombes" style="max-width: 100%; max-height: 400px;">
         </div>
       `;
       break;
@@ -936,8 +1111,9 @@ document.addEventListener('DOMContentLoaded', function() {
 function precacheResources() {
   // Préchargement des images pour éviter les retards de rendu
   const urls = [
-    'https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/LITTLEBOY.png',
-    'https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/FATMAN.png',
+    'https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/little_boy_hiroshima.svg.png',
+    'https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/fat_man_Nagasaki.png',
+    'https://raw.githubusercontent.com/SIGATNguyen/Makarto/main/assets/deux_bombes.png',
     'https://upload.wikimedia.org/wikipedia/commons/0/09/The_USS_Arizona_%28BB-39%29_burning_after_the_Japanese_attack_on_Pearl_Harbor_-_NARA_195617_-_Edit.jpg',
     'https://upload.wikimedia.org/wikipedia/commons/a/a5/Battle_of_Midway%2C_June_1942_%2823-N-69293%29.jpg',
     'https://upload.wikimedia.org/wikipedia/commons/7/75/Marines_of_the_28th_Regiment_of_the_5th_Division_raise_the_American_flag_atop_Mt._Suribachi%2C_Iwo_Jima%2C_on_Feb._23%2C_1945..jpg',
